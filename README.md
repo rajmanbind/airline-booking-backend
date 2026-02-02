@@ -17,3 +17,46 @@ Lets take a look insida the `src` folder
 - `services` --> Contains the business logic and interacts with repositories for data from the database.
 
 - `utils` --> Contains helper methods , error classes etc.
+
+### Setup the project
+
+-  Download this template from github and open it in your favourite text editor.
+- In the root directory create `.env` file and the following env variables
+``` 
+    PORT= <port number of your choice>
+```
+ex:
+```
+PORT=3000
+
+```
+- Inside the `src/config` folder create a file name as `config.json` and write the following code:
+```
+{
+  "development": {
+    "username": "root",
+    "password": null,
+    "database": "database_development",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
+```
+
+- If you are setting up your developement evironment, then write the username of your db, passwordof your db and in  dialec mention whatever db you are using for ex:  mysql, pg, mariadb etc
+
+- If you're setting up test or production environment, make sure you also replace the post with the hosted db url.
