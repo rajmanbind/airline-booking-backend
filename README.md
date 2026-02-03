@@ -21,6 +21,10 @@ Lets take a look insida the `src` folder
 ### Setup the project
 
 -  Download this template from github and open it in your favourite text editor.
+- Go inside the root directory and execute the following command: 
+```
+npm install
+```
 - In the root directory create `.env` file and the following env variables
 ``` 
     PORT= <port number of your choice>
@@ -56,7 +60,17 @@ PORT=3000
   }
 }
 ```
+- Go inside `src` folder and run the following command: 
+```
+npx sequelize init
+```
+- by executing the above command you will get migrations and seeeders folder along with `config.json` file inside the config folder.
 
 - If you are setting up your developement evironment, then write the username of your db, passwordof your db and in  dialec mention whatever db you are using for ex:  mysql, pg, mariadb etc
 
 - If you're setting up test or production environment, make sure you also replace the post with the hosted db url.
+
+- To run the server execute:
+``` 
+npm run dev
+```
