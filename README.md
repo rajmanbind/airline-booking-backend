@@ -64,9 +64,9 @@ PORT=3000
 ```
 npx sequelize init
 ```
-- by executing the above command you will get migrations and seeeders folder along with `config.json` file inside the config folder.
+- by executing the above command you will get migrations and seeders folder along with `config.json` file inside the config folder.
 
-- If you are setting up your developement evironment, then write the username of your db, passwordof your db and in  dialec mention whatever db you are using for ex:  mysql, pg, mariadb etc
+- If you are setting up your developement evironment, then write the username of your db, password of your db and in  dialec mention whatever db you are using for ex:  mysql, pg, mariadb etc
 
 - If you're setting up test or production environment, make sure you also replace the post with the hosted db url.
 
