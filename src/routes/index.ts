@@ -8,11 +8,8 @@ const apiRoutes = express.Router();
 apiRoutes.get("/", (req:Request, res:Response) => {
   res.json({
     message: "Flight Booking API",
-    version: "1.0.0",
-    endpoints: {
-      airplanes: "/api",
-      health: "/health",
-    },
+    version: "1.0.0"
+  
   });
 });
 apiRoutes.use("/v1", v1Router)

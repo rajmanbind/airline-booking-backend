@@ -35,40 +35,19 @@ PORT=3000
 
 ```
 - Inside the `src/config` folder create a file name as `config.json` and write the following code:
-```
-{
-  "development": {
-    "username": "root",
-    "password": null,
-    "database": "database_development",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  },
-  "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  },
-  "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  }
-}
-```
-- Go inside `src` folder and run the following command: 
-```
-npx sequelize init
-```
-- by executing the above command you will get migrations and seeders folder along with `config.json` file inside the config folder.
+- This project uses environment variables and `src/config/servier-config.ts` (ServerConfig) to configure the app.
 
-- If you are setting up your developement evironment, then write the username of your db, password of your db and in  dialec mention whatever db you are using for ex:  mysql, pg, mariadb etc
+- Create a `.env` file in the project root (see `.env.example`) and set your DB credentials and other settings. `ServerConfig` reads these variables at startup.
 
-- If you're setting up test or production environment, make sure you also replace the post with the hosted db url.
+- Migrations are placed in `src/migrations` (dev) and compiled to `dist/migrations` for production. You can generate migration templates with `sequelize-cli` if you want, but do not commit plaintext credential files.
+
+  If you need the `sequelize-cli` helper locally:
+  ```bash
+  npx sequelize-cli init
+  npx sequelize-cli model:generate --name Example --attributes name:string
+  ```
+
+  Note: the codebase now uses Umzug to run migrations (`src/utils/migrate.ts`). Prefer running migrations as a CI/CD step or a single leader job in production rather than from every app instance.
 
 - To run the server execute:
 ``` 

@@ -13,18 +13,30 @@ if (missingVars.length > 0) {
 const ServerConfig = {
   // Server
   PORT: Number(process.env.PORT) || 3000,
-  NODE_ENV: process.env.NODE_ENV || "development",
-  
+  NODE_ENV: process.env.NODE_ENV || 'development',
+
   // Database
   DB_HOST: process.env.DB_HOST || 'localhost',
   DB_PORT: Number(process.env.DB_PORT) || 3306,
-  DB_USER: process.env.DB_USER!,  // ! means we validated it exists above
+  DB_USER: process.env.DB_USER!, // validated above
   DB_PASS: process.env.DB_PASS || '',
   DB_NAME: process.env.DB_NAME!,
   DB_NAME_TEST: process.env.DB_NAME_TEST || 'flight_booking_test',
-  
+
+  // DB SSL (for managed DBs)
+  DB_SSL: process.env.DB_SSL === 'true' || false,
+
+  // Connection pool settings
+  DB_POOL_MAX: Number(process.env.DB_POOL_MAX) || 5,
+  DB_POOL_MIN: Number(process.env.DB_POOL_MIN) || 0,
+  DB_POOL_ACQUIRE: Number(process.env.DB_POOL_ACQUIRE) || 30000,
+  DB_POOL_IDLE: Number(process.env.DB_POOL_IDLE) || 10000,
+
   // Logging
   LOG_LEVEL: process.env.LOG_LEVEL || 'info',
+
+  // Optional behavior
+  RUN_MIGRATIONS_AT_STARTUP: process.env.RUN_MIGRATIONS_AT_STARTUP === 'true',
 } as const;
 
 // Type-safe helper

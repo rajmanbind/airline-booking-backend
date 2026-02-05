@@ -1,6 +1,7 @@
 import { Logger } from "../config";
 import Airplane from "../models/Airlplane";
-import { CrudRepository } from "./crud-reposotories";
+import { CrudRepository } from "./crud-repositories";
+import { Op } from 'sequelize';
 
 export function AirplaneRepository() {
  const baseRepo = CrudRepository(Airplane);
@@ -19,7 +20,7 @@ export function AirplaneRepository() {
     try {
       return await Airplane.findAll({
         where: {
-          capacity: { $gte: minCapacity },
+          capacity: { [Op.gte]: minCapacity },
         },
       });
     } catch (error) {
@@ -28,9 +29,24 @@ export function AirplaneRepository() {
     }
   };
 
+  const getAll = async (opts: { where?: any; limit?: number; offset?: number; order?: any } = {}) => {
+    try {
+      const { where = {}, limit, offset, order = [['id', 'ASC']] } = opts;
+      const result = await Airplane.findAndCountAll({ where, limit, offset, order });
+      return {
+        rows: result.rows,
+        count: result.count,
+      };
+    } catch (error) {
+      Logger.error('Something went wrong in AirplaneRepo: getAll', error);
+      throw error;
+    }
+  };
+
   return {
     ...baseRepo,
     getByModelNumber,
     getLargeCapacityPlanes,
+    getAll,
   };
 }

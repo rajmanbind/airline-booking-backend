@@ -27,7 +27,7 @@ const config: Record<string, DbConfig> = {
     host: ServerConfig.DB_HOST,
     port: ServerConfig.DB_PORT,
     dialect: 'mysql',
-    // logging: console.log,
+    logging: console.log,
   },
   test: {
     database: ServerConfig.DB_NAME_TEST,
@@ -44,7 +44,7 @@ const config: Record<string, DbConfig> = {
     password: ServerConfig.DB_PASS,
     host: ServerConfig.DB_HOST,
     port: ServerConfig.DB_PORT,
-    dialect: 'postgres',
+    dialect: 'mysql',
     logging: false,
     pool: {
       max: 5,
@@ -67,6 +67,18 @@ const sequelize = new Sequelize(
     dialect: dbConfig.dialect,
     logging: dbConfig.logging,
     pool: dbConfig.pool,
+    // MySQL-specific recommended options
+    dialectOptions: {
+      // e.g., enable SSL when connecting to managed MySQL services
+      // ssl: process.env.DB_SSL ? { rejectUnauthorized: true } : undefined,
+    },
+    define: {
+      charset: 'utf8mb4',
+      collate: 'utf8mb4_unicode_ci',
+    },
+    retry: {
+      max: 3,
+    },
   }
 );
 

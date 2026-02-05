@@ -2,13 +2,7 @@ import { Logger } from "../config";
 
 export function CrudRepository(model: any) {
   const create = async (data: any) => {
-    try {
-      const resposne = await model.create(data);
-      return resposne;
-    } catch (error) {
-      Logger.error("Something went wrong in the crud Repo: create");
-      throw error;
-    }
+     return await model.create(data);
   };
   const destroy = async (data: any) => {
     try {

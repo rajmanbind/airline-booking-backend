@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const airplane_controller_1 = require("../../controllers/airplane-controller");
+const airPlaneRouter = (0, express_1.Router)();
+airPlaneRouter.post("/", airplane_controller_1.AirplaneController.createAirplane);
+airPlaneRouter.get("/", airplane_controller_1.AirplaneController.getAll);
+airPlaneRouter.get("/:id", airplane_controller_1.AirplaneController.getAirplaneById);
+airPlaneRouter.put("/:id", airplane_controller_1.AirplaneController.update);
+airPlaneRouter.delete("/:id", airplane_controller_1.AirplaneController.delete);
+exports.default = airPlaneRouter;

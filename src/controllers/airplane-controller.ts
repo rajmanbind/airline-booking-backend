@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AirplaneService } from "../services/airplane-service";
 import { Logger } from "../config";
 import { StatusCodes } from "http-status-codes";
+import { ErrorResponse, SuccessResponse } from "../utils/common";
 
 export const AirplaneController = {
   async createAirplane(req: Request, res: Response, next: NextFunction) {
@@ -10,20 +11,15 @@ export const AirplaneController = {
         modelNumber: req.body.modelNumber,
         capacity: req.body.capacity,
       });
-      return res.status(StatusCodes.CREATED).json({
-        success: true,
-        message: "Airplane created successfully",
-        data: airplane,
-        error: {},
-      });
-    } catch (error) {
+      SuccessResponse.data = airplane
+      SuccessResponse.message='Airplane created successfully';
+      return res.status(StatusCodes.CREATED).json(SuccessResponse);
+    } catch (error:any) {
       Logger.error("Something went wrong in AirplaneController: create",error);
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Something went wrong while creating airplane",
-        data: {},
-        error,
-      });
+      ErrorResponse.error=error
+      
+      return res.status(error.statusCode).json(ErrorResponse);
+      
     }
   },
 
@@ -56,12 +52,12 @@ export const AirplaneController = {
 
   async getAll(req: Request, res: Response) {
     try {
-      const airplanes = await AirplaneService.getAllAirplanes(req.query);
+      const result = await AirplaneService.getAllAirplanes(req.query);
       return res.status(StatusCodes.OK).json({
         success: true,
-        message: "Airplane fetch successfully!",
-        error: {},
-        data: airplanes,
+        message: "Airplanes fetched successfully",
+        data: result.data,
+        meta: result.meta,
       });
     } catch (error) {
       Logger.error("Something went wrong in AirplaneController: getAll",error);

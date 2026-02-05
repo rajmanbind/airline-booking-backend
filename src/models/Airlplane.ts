@@ -4,7 +4,6 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 interface AirplaneAttributes {
   id: number;
   modelNumber: string;
-  hari: string;
   capacity: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -23,7 +22,6 @@ class Airplane
 {
   public id!: number;
   public modelNumber!: string;
-  public hari!: string;
   public capacity!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -41,15 +39,15 @@ export const initAirplaneModel = (sequelize: Sequelize): typeof Airplane => {
       modelNumber: {
         type: DataTypes.STRING,
         allowNull: false,
-      },
-      hari: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        validate: {len: [1, 255] },
       },
       capacity: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 2222,
+        defaultValue: 0,
+        validate: {
+          max: 1000, // Assuming a reasonable max capacity for an airplane
+        }
       },
     },
     {
@@ -57,7 +55,7 @@ export const initAirplaneModel = (sequelize: Sequelize): typeof Airplane => {
       tableName: "airplanes",
       modelName: "Airplane",
       timestamps: true,
-      underscored: true,
+      underscored: false,
     },
   );
 
