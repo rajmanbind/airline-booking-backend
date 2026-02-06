@@ -40,9 +40,11 @@ const express_1 = __importDefault(require("express"));
 const routes_1 = __importDefault(require("./routes"));
 const config_1 = require("./config");
 const models_1 = require("./models");
+const middlewares_1 = require("./middlewares");
 // Create app
 const app = (0, express_1.default)();
-// Middleware
+// Security + Middleware
+(0, middlewares_1.applySecurity)(app);
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 // Mount router 
@@ -55,42 +57,78 @@ app.get("/health", (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
-// Database connection and server start
+// Error handler (after routes)
+app.use(middlewares_1.errorHandler);
+// Database connection and server start with graceful shutdown
 const startServer = async () => {
+    let server = null;
     try {
         // Test database connection
         await models_1.sequelize.authenticate();
         config_1.Logger.info("✅ Database connection established successfully");
-        // Run migrations instead of using sequelize.sync in environments
-        try {
-            const { runMigrations } = await Promise.resolve().then(() => __importStar(require('./utils/migrate')));
-            await runMigrations();
-            config_1.Logger.info('✅ Database migrations applied');
+        // Optionally run migrations at startup (useful for single-instance deployments)
+        if (config_1.ServerConfig.RUN_MIGRATIONS_AT_STARTUP) {
+            try {
+                const { runMigrations } = await Promise.resolve().then(() => __importStar(require('./utils/migrate')));
+                await runMigrations();
+                config_1.Logger.info('✅ Database migrations applied');
+            }
+            catch (mErr) {
+                config_1.Logger.error('❌ Migration error:', mErr);
+                throw mErr;
+            }
         }
-        catch (mErr) {
-            config_1.Logger.error('❌ Migration error:', mErr);
-            throw mErr;
+        else {
+            config_1.Logger.info('🔁 Skipping automatic migrations at startup');
         }
-        // Start server
-        app.listen(config_1.ServerConfig.PORT, () => {
+        // Start server and keep reference
+        server = app.listen(config_1.ServerConfig.PORT, () => {
             config_1.Logger.info(`🚀 Server started on PORT: ${config_1.ServerConfig.PORT}`);
         });
     }
     catch (error) {
         config_1.Logger.error("❌ Unable to start server:", error);
-        process.exit(1);
+        // attempt graceful shutdown if server started
+        if (server) {
+            server.close(() => {
+                config_1.Logger.info('Server closed after failed start');
+                process.exit(1);
+            });
+        }
+        else {
+            process.exit(1);
+        }
     }
+    // Graceful shutdown helper
+    const gracefulShutdown = async (signal, err) => {
+        try {
+            config_1.Logger.info(`Received ${signal}. Shutting down gracefully...`);
+            if (server) {
+                server.close(() => config_1.Logger.info('HTTP server closed'));
+            }
+            await models_1.sequelize.close();
+            config_1.Logger.info('Database connection closed');
+            if (err)
+                config_1.Logger.error('Shutdown due to error:', err);
+            process.exit(0);
+        }
+        catch (shutdownErr) {
+            config_1.Logger.error('Error during graceful shutdown', shutdownErr);
+            process.exit(1);
+        }
+    };
+    // Handle unhandled promise rejections
+    process.on('unhandledRejection', (reason) => {
+        config_1.Logger.error('Unhandled Rejection at:', reason);
+        // Try graceful shutdown then exit
+        gracefulShutdown('unhandledRejection', reason instanceof Error ? reason : undefined);
+    });
+    // Handle uncaught exceptions
+    process.on('uncaughtException', (error) => {
+        config_1.Logger.error('Uncaught Exception:', error);
+        gracefulShutdown('uncaughtException', error instanceof Error ? error : undefined);
+    });
 };
 // Start the server
 startServer();
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (reason, promise) => {
-    config_1.Logger.error("Unhandled Rejection at:", promise, "reason:", reason);
-    process.exit(1);
-});
-// Handle uncaught exceptions
-process.on("uncaughtException", (error) => {
-    config_1.Logger.error("Uncaught Exception:", error);
-    process.exit(1);
-});
 exports.default = app;

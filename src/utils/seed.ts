@@ -33,12 +33,27 @@ export async function runSeeders() {
   console.log('Seeders complete.');
 }
 
+export async function undoSeeders() {
+  console.log('Reverting seeders...');
+  await umzug.down();
+  console.log('Seeders reverted successfully.');
+}
+
 export default umzug;
 
 if (require.main === module) {
-  runSeeders().catch((err) => {
-    // eslint-disable-next-line no-console
-    console.error('Seeding failed:', err);
-    process.exit(1);
-  });
+  const args = process.argv.slice(2);
+  const command = args[0];
+
+  if (command === 'down' || command === 'undo') {
+    undoSeeders().catch((err) => {
+      console.error('Undoing seeders failed:', err);
+      process.exit(1);
+    });
+  } else {
+    runSeeders().catch((err) => {
+      console.error('Seeding failed:', err);
+      process.exit(1);
+    });
+  }
 }

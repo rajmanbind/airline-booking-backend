@@ -15,7 +15,7 @@ const config = {
         host: servier_config_1.default.DB_HOST,
         port: servier_config_1.default.DB_PORT,
         dialect: 'mysql',
-        // logging: console.log,
+        logging: console.log,
     },
     test: {
         database: servier_config_1.default.DB_NAME_TEST,
@@ -32,7 +32,7 @@ const config = {
         password: servier_config_1.default.DB_PASS,
         host: servier_config_1.default.DB_HOST,
         port: servier_config_1.default.DB_PORT,
-        dialect: 'postgres',
+        dialect: 'mysql',
         logging: false,
         pool: {
             max: 5,
@@ -50,5 +50,17 @@ const sequelize = new sequelize_1.Sequelize(dbConfig.database, dbConfig.username
     dialect: dbConfig.dialect,
     logging: dbConfig.logging,
     pool: dbConfig.pool,
+    // MySQL-specific recommended options
+    dialectOptions: {
+    // e.g., enable SSL when connecting to managed MySQL services
+    // ssl: process.env.DB_SSL ? { rejectUnauthorized: true } : undefined,
+    },
+    define: {
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_unicode_ci',
+    },
+    retry: {
+        max: 3,
+    },
 });
 exports.default = sequelize;

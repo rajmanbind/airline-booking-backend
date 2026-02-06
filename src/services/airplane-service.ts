@@ -1,7 +1,7 @@
 import { AirplaneRepository } from "../repositories/airplane-repository";
 import { Logger } from "../config";
-import {AppError} from "../utils/errors/app-error";
-import { Op } from 'sequelize';
+import { AppError } from "../utils/errors/app-error";
+import { Op } from "sequelize";
 import { StatusCodes } from "http-status-codes";
 
 const airplaneRepo = AirplaneRepository();
@@ -20,18 +20,22 @@ export const AirplaneService = {
         throw new AppError(explanations, StatusCodes.BAD_REQUEST);
       }
 
-      // For unexpected errors, wrap with 500 and the error message
-      const message = error instanceof Error ? error.message : 'Internal Server Error';
+      const message =
+        error instanceof Error ? error.message : "Internal Server Error";
       throw new AppError([message], StatusCodes.INTERNAL_SERVER_ERROR);
     }
   },
 
   async getAirplaneById(id: number) {
     try {
-      return await airplaneRepo.getById(id);
-    } catch (error) {
-      Logger.error("Something went wrong in AirplaneService: getAirplaneById", error);
-      throw error;
+      const response = await airplaneRepo.getById(id);
+    
+      return response;
+    } catch (error:any) {
+        if(error.statusCode===StatusCodes.NOT_FOUND){
+          throw  new AppError("The airplane you requested is not present", StatusCodes.NOT_FOUND);
+        }
+    throw new AppError("Cannot fetch data of all airplanes", StatusCodes.INTERNAL_SERVER_ERROR);
     }
   },
 
@@ -44,18 +48,28 @@ export const AirplaneService = {
 
       // Build where clause from possible filters (e.g., minCapacity, modelNumber)
       const where: any = {};
-      if (filters.minCapacity) where.capacity = { [Op.gte]: Number(filters.minCapacity) };
+      if (filters.minCapacity)
+        where.capacity = { [Op.gte]: Number(filters.minCapacity) };
       if (filters.modelNumber) where.modelNumber = String(filters.modelNumber);
 
       // determine sorting
-      let order: any = [['id', 'ASC']];
+      let order: any = [["id", "ASC"]];
       const sortField = filters.sort || filters.sortBy;
-      const sortDir = (String(filters.order || filters.direction || '').toLowerCase() === 'desc') ? 'DESC' : 'ASC';
+      const sortDir =
+        String(filters.order || filters.direction || "").toLowerCase() ===
+        "desc"
+          ? "DESC"
+          : "ASC";
       if (sortField) {
         order = [[String(sortField), sortDir]];
       }
 
-      const { rows, count } = await airplaneRepo.getAll({ where, limit, offset, order });
+      const { rows, count } = await airplaneRepo.getAll({
+        where,
+        limit,
+        offset,
+        order,
+      });
       return {
         data: rows,
         meta: {
@@ -66,7 +80,10 @@ export const AirplaneService = {
         },
       };
     } catch (error) {
-      Logger.error("Something went wrong in AirplaneService: getAllAirplanes", error);
+      Logger.error(
+        "Something went wrong in AirplaneService: getAllAirplanes",
+        error,
+      );
       throw error;
     }
   },

@@ -5,9 +5,9 @@ import asyncHandler from "../../utils/async-handler";
 
 const airPlaneRouter = Router();
 
-airPlaneRouter.post("/", validateCreateRequest, asyncHandler(AirplaneController.createAirplane));
+airPlaneRouter.post("/", validateCreateRequest, asyncHandler(AirplaneController.create));
 airPlaneRouter.get("/", asyncHandler(AirplaneController.getAll));
-airPlaneRouter.get("/:id", asyncHandler(AirplaneController.getAirplaneById));
+airPlaneRouter.get("/:id", asyncHandler(AirplaneController.getById));
 airPlaneRouter.put("/:id", asyncHandler(AirplaneController.update));
 airPlaneRouter.delete("/:id", asyncHandler(AirplaneController.delete));
 

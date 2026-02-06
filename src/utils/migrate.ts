@@ -1,13 +1,9 @@
 import { Umzug, SequelizeStorage } from 'umzug';
 import path from 'path';
 import sequelize from '../config/database';
-import { ServerConfig } from '../config';
 
-const isProduction = ServerConfig.NODE_ENV === 'production';
-
-const migrationsGlob = isProduction
-  ? path.join(process.cwd(), 'dist', 'migrations', '*.js')
-  : path.join(process.cwd(), 'src', 'migrations', '*.ts');
+// Always use TypeScript files in development for now
+const migrationsGlob = path.join(process.cwd(), 'src', 'migrations', '*.ts');
 
 const umzug = new Umzug({
   migrations: {

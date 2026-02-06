@@ -10,8 +10,9 @@
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "migrate": "ts-node src/utils/migrate.ts"
-    ,"seed": "ts-node src/utils/seed.ts"
+    "migrate": "ts-node src/utils/migrate.ts",
+    "seed": "ts-node src/utils/seed.ts",
+    "seed:undo": "ts-node src/utils/seed.ts down"
   },
   "dependencies": {
     "cors": "^2.8.6",

@@ -11,11 +11,7 @@ const apiRoutes = express_1.default.Router();
 apiRoutes.get("/", (req, res) => {
     res.json({
         message: "Flight Booking API",
-        version: "1.0.0",
-        endpoints: {
-            airplanes: "/api",
-            health: "/health",
-        },
+        version: "1.0.0"
     });
 });
 apiRoutes.use("/v1", v1_1.default);

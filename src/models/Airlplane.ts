@@ -5,6 +5,10 @@ interface AirplaneAttributes {
   id: number;
   modelNumber: string;
   capacity: number;
+  airlineId?: number;
+  registrationNumber?: string;
+  manufacturerYear?: number;
+  status: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -23,6 +27,10 @@ class Airplane
   public id!: number;
   public modelNumber!: string;
   public capacity!: number;
+  public airlineId!: number;
+  public registrationNumber!: string;
+  public manufacturerYear!: number;
+  public status!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -46,8 +54,36 @@ export const initAirplaneModel = (sequelize: Sequelize): typeof Airplane => {
         allowNull: false,
         defaultValue: 0,
         validate: {
-          max: 1000, // Assuming a reasonable max capacity for an airplane
+          max: 1000,
         }
+      },
+      airlineId: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
+        references: {
+          model: 'airlines',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
+      registrationNumber: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+        unique: true,
+      },
+      manufacturerYear: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: {
+          min: 1900,
+          max: 2100,
+        }
+      },
+      status: {
+        type: DataTypes.ENUM('active', 'maintenance', 'retired'),
+        allowNull: false,
+        defaultValue: 'active',
       },
     },
     {
@@ -64,12 +100,18 @@ export const initAirplaneModel = (sequelize: Sequelize): typeof Airplane => {
 
 // Association function
 export const associateAirplane = (models: any): void => {
-  // Define associations here
-  // Example:
-  // Airplane.hasMany(models.Flight, {
-  //   foreignKey: 'airplane_id',
-  //   as: 'flights',
-  // });
+  Airplane.belongsTo(models.Airline, {
+    foreignKey: 'airlineId',
+    as: 'airline',
+  });
+  Airplane.hasMany(models.Seat, {
+    foreignKey: 'airplaneId',
+    as: 'seats',
+  });
+  Airplane.hasMany(models.Flight, {
+    foreignKey: 'airplaneId',
+    as: 'flights',
+  });
 };
 
 // Export the model class

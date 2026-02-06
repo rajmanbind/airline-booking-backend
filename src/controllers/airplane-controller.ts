@@ -5,7 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import { ErrorResponse, SuccessResponse } from "../utils/common";
 
 export const AirplaneController = {
-  async createAirplane(req: Request, res: Response, next: NextFunction) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const airplane = await AirplaneService.createAirplane({
         modelNumber: req.body.modelNumber,
@@ -15,7 +15,6 @@ export const AirplaneController = {
       SuccessResponse.message='Airplane created successfully';
       return res.status(StatusCodes.CREATED).json(SuccessResponse);
     } catch (error:any) {
-      Logger.error("Something went wrong in AirplaneController: create",error);
       ErrorResponse.error=error
       
       return res.status(error.statusCode).json(ErrorResponse);
@@ -23,30 +22,27 @@ export const AirplaneController = {
     }
   },
 
-  async getAirplaneById(req: Request, res: Response) {
+  async getById(req: Request, res: Response) {
     try {
       const airplane = await AirplaneService.getAirplaneById(
         Number(req.params.id),
       );
 
       if (!airplane) {
-        return res.status(404).json({
+        return res.status(StatusCodes.NOT_FOUND).json({
           success: false,
           message: "Airplane not found",
         });
+      
       }
 
       return res.status(200).json({
         success: true,
         data: airplane,
       });
-    } catch (error) {
-      Logger.error("Something went wrong in AirplaneController: getById",error);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to fetch airplane",
-        error,
-      });
+    } catch (error:any) {
+            ErrorResponse.error=error
+      return res.status(error.statusCode).json(ErrorResponse);
     }
   },
 
@@ -59,15 +55,10 @@ export const AirplaneController = {
         data: result.data,
         meta: result.meta,
       });
-    } catch (error) {
-      Logger.error("Something went wrong in AirplaneController: getAll",error);
+    } catch (error:any) {
 
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Something went wrong while fetching airplane",
-        data: {},
-        error,
-      });
+                ErrorResponse.error=error
+      return res.status(error.statusCode).json(ErrorResponse);
     }
   },
 
@@ -90,15 +81,10 @@ export const AirplaneController = {
         data: updated,
         message: "Airplane updated successfully",
       });
-    } catch (error) {
-      Logger.error("Something went wrong in AirplaneController: update",error);
+    } catch (error:any) {
 
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Something went wrong while update airplane",
-        data: {},
-        error,
-      });
+              ErrorResponse.error=error
+      return res.status(error.statusCode).json(ErrorResponse);
     }
   },
 
@@ -119,15 +105,10 @@ export const AirplaneController = {
         success: true,
         message: "Airplane deleted successfully",
       });
-    } catch (error) {
-      Logger.error("Something went wrong in AirplaneController: delete",error);
+    } catch (error:any) {
 
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Something went wrong while delete airplane",
-        data: {},
-        error,
-      });
+                ErrorResponse.error=error
+      return res.status(error.statusCode).json(ErrorResponse);
     }
   },
 };

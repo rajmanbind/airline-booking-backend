@@ -6,9 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AirplaneRepository = AirplaneRepository;
 const config_1 = require("../config");
 const Airlplane_1 = __importDefault(require("../models/Airlplane"));
-const crud_reposotories_1 = require("./crud-reposotories");
+const crud_repositories_1 = require("./crud-repositories");
+const sequelize_1 = require("sequelize");
 function AirplaneRepository() {
-    const baseRepo = (0, crud_reposotories_1.CrudRepository)(Airlplane_1.default);
+    const baseRepo = (0, crud_repositories_1.CrudRepository)(Airlplane_1.default);
     // Add domain-specific methods here
     const getByModelNumber = async (modelNumber) => {
         try {
@@ -23,7 +24,7 @@ function AirplaneRepository() {
         try {
             return await Airlplane_1.default.findAll({
                 where: {
-                    capacity: { $gte: minCapacity },
+                    capacity: { [sequelize_1.Op.gte]: minCapacity },
                 },
             });
         }
@@ -32,9 +33,24 @@ function AirplaneRepository() {
             throw error;
         }
     };
+    const getAllAirplanes = async (opts = {}) => {
+        try {
+            const { where = {}, limit, offset, order = [['id', 'ASC']] } = opts;
+            const result = await Airlplane_1.default.findAndCountAll({ where, limit, offset, order });
+            return {
+                rows: result.rows,
+                count: result.count,
+            };
+        }
+        catch (error) {
+            config_1.Logger.error('Something went wrong in AirplaneRepo: getAllAirplanes', error);
+            throw error;
+        }
+    };
     return {
         ...baseRepo,
         getByModelNumber,
         getLargeCapacityPlanes,
+        getAllAirplanes,
     };
 }

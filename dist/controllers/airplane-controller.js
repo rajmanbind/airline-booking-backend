@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AirplaneController = void 0;
 const airplane_service_1 = require("../services/airplane-service");
-const config_1 = require("../config");
 const http_status_codes_1 = require("http-status-codes");
+const common_1 = require("../utils/common");
 exports.AirplaneController = {
     async createAirplane(req, res, next) {
         try {
@@ -11,21 +11,13 @@ exports.AirplaneController = {
                 modelNumber: req.body.modelNumber,
                 capacity: req.body.capacity,
             });
-            return res.status(http_status_codes_1.StatusCodes.CREATED).json({
-                success: true,
-                message: "Airplane created successfully",
-                data: airplane,
-                error: {},
-            });
+            common_1.SuccessResponse.data = airplane;
+            common_1.SuccessResponse.message = 'Airplane created successfully';
+            return res.status(http_status_codes_1.StatusCodes.CREATED).json(common_1.SuccessResponse);
         }
         catch (error) {
-            config_1.Logger.error("Something went wrong in AirplaneController: create", error);
-            return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: "Something went wrong while creating airplane",
-                data: {},
-                error,
-            });
+            common_1.ErrorResponse.error = error;
+            return res.status(error.statusCode).json(common_1.ErrorResponse);
         }
     },
     async getAirplaneById(req, res) {
@@ -43,7 +35,6 @@ exports.AirplaneController = {
             });
         }
         catch (error) {
-            config_1.Logger.error("Something went wrong in AirplaneController: getById", error);
             return res.status(500).json({
                 success: false,
                 message: "Failed to fetch airplane",
@@ -51,18 +42,17 @@ exports.AirplaneController = {
             });
         }
     },
-    async getAll(req, res) {
+    async getAllAirplane(req, res) {
         try {
-            const airplanes = await airplane_service_1.AirplaneService.getAllAirplanes(req.query);
+            const result = await airplane_service_1.AirplaneService.getAllAirplanes(req.query);
             return res.status(http_status_codes_1.StatusCodes.OK).json({
                 success: true,
-                message: "Airplane fetch successfully!",
-                error: {},
-                data: airplanes,
+                message: "Airplanes fetched successfully",
+                data: result.data,
+                meta: result.meta,
             });
         }
         catch (error) {
-            config_1.Logger.error("Something went wrong in AirplaneController: getAll", error);
             return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: "Something went wrong while fetching airplane",
@@ -87,7 +77,6 @@ exports.AirplaneController = {
             });
         }
         catch (error) {
-            config_1.Logger.error("Something went wrong in AirplaneController: update", error);
             return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: "Something went wrong while update airplane",
@@ -111,7 +100,6 @@ exports.AirplaneController = {
             });
         }
         catch (error) {
-            config_1.Logger.error("Something went wrong in AirplaneController: delete", error);
             return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: "Something went wrong while delete airplane",

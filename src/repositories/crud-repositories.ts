@@ -1,78 +1,59 @@
-import { Logger } from "../config";
+import { StatusCodes } from "http-status-codes";
+import { AppError } from "../utils/errors/app-error";
 
 export function CrudRepository(model: any) {
   const create = async (data: any) => {
-     return await model.create(data);
+    return await model.create(data);
   };
-  const destroy = async (data: any) => {
-    try {
-      const resposne = await model.destroy({
-        where: {
-          id: data,
-        },
-      });
-      return resposne;
-    } catch (error) {
-      Logger.error("Something went wrong in the crud Repo: destroy");
-      throw error;
-    }
+  const destroy = async (id: number) => {
+    const response = await model.destroy({
+      where: {
+        id,
+      },
+    });
+    return response;
   };
-  const getById = async (id: any) => {
-    try {
-      const resposne = await model.findByPk(id);
-      return resposne;
-    } catch (error) {
-      Logger.error("Something went wrong in the crud Repo: getById");
-      throw error;
+  const getById = async (id: number) => {
+    const response = await model.findByPk(id);
+    if (!response) {
+      throw new AppError(
+        "The airplane you requested is not present",
+        StatusCodes.NOT_FOUND,
+      );
     }
-  };
-  const getAll = async (id: any) => {
-    try {
-      const resposne = await model.findAll(id);
-      return resposne;
-    } catch (error) {
-      Logger.error("Something went wrong in the crud Repo: getAll");
-      throw error;
-    }
+    return response;
   };
 
   const update = async (id: number, data: any) => {
-    // data: {}
-    try {
-      const record = await model.findByPk(id);
-      if (!record) return null;
-      return await record.update(data);
-
-      // const response = await model.update(data,{
-      //     where:{
-      //         id:id,
-      //     }
-      // })
-      // return response;
-    } catch (error) {
-      Logger.error("Something went wrong in the crud Repo: update");
-      throw error;
-    }
+    const record = await model.findByPk(id);
+    if (!record) return null;
+    return await record.update(data);
   };
 
   const deleteById = async (id: number) => {
-    try {
-      const record = await model.findByPk(id);
-      if (!record) return null;
-      await record.destroy();
-      return true;
-    } catch (error) {
-      Logger.error("Something went wrong in the crud Repo: deleteById");
-      throw error;
-    }
+    const record = await model.findByPk(id);
+    if (!record) return null;
+    await record.destroy();
+    return true;
+  };
+
+  const findAll = async (options: any = {}) => {
+    const response = await model.findAll(options);
+    return response;
+  };
+
+  const findAndCountAll = async (options: any = {}) => {
+    const response = await model.findAndCountAll(options);
+    return response;
   };
 
   return {
     create,
     getById,
-    getAll,
     update,
     destroy,
     deleteById,
+    findAll,
+    findAndCountAll,
   };
 }

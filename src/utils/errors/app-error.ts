@@ -2,9 +2,9 @@
 
 class AppError extends Error {
   statusCode: number;
-  explanation: string[];
+  explanation:string| string[];
 
-  constructor(message:string[], statusCode = 500) {
+  constructor(message:string|string[], statusCode = 500) {
     const messageStr = Array.isArray(message) ? message.join("; ") : message;
     super(messageStr);
     this.statusCode = statusCode;
