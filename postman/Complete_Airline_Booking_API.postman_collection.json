@@ -1,0 +1,979 @@
+{
+	"info": {
+		"_postman_id": "complete-airline-booking-api",
+		"name": "Complete Airline Booking API",
+		"description": "Full API collection for all Airline Booking System endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Airlines",
+			"item": [
+				{
+					"name": "Create Airline",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"AA\",\n  \"name\": \"American Airlines\",\n  \"country\": \"United States\",\n  \"logo\": \"https://example.com/aa-logo.png\",\n  \"website\": \"https://www.aa.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airlines",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airlines"]
+						}
+					}
+				},
+				{
+					"name": "Get All Airlines",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airlines?page=1&limit=20&sortBy=name&order=asc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airlines"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"},
+								{"key": "sortBy", "value": "name"},
+								{"key": "order", "value": "asc"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Airline by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airlines/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airlines", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Airline by Code",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airlines/code/AA",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airlines", "code", "AA"]
+						}
+					}
+				},
+				{
+					"name": "Update Airline",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"American Airlines Inc.\",\n  \"website\": \"https://www.americanairlines.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airlines/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airlines", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Airline",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airlines/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airlines", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Airports",
+			"item": [
+				{
+					"name": "Create Airport",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"JFK\",\n  \"name\": \"John F. Kennedy International Airport\",\n  \"cityId\": 1,\n  \"timezone\": \"America/New_York\",\n  \"latitude\": 40.6413,\n  \"longitude\": -73.7781\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airports",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airports"]
+						}
+					}
+				},
+				{
+					"name": "Get All Airports",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airports?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airports"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Airport by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airports/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airports", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Airport by Code",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airports/code/JFK",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airports", "code", "JFK"]
+						}
+					}
+				},
+				{
+					"name": "Get Airports by City",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airports/city/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airports", "city", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Airport",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"JFK International Airport\",\n  \"latitude\": 40.6413111,\n  \"longitude\": -73.7781389\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airports/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airports", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Airport",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airports/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airports", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Flights",
+			"item": [
+				{
+					"name": "Create Flight",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"flightNumber\": \"AA101\",\n  \"airlineId\": 1,\n  \"airplaneId\": 1,\n  \"departureAirportId\": 1,\n  \"arrivalAirportId\": 2,\n  \"departureTime\": \"2026-03-15T08:00:00Z\",\n  \"arrivalTime\": \"2026-03-15T11:30:00Z\",\n  \"duration\": 210,\n  \"status\": \"scheduled\",\n  \"price\": 299.99,\n  \"boardingGate\": \"A12\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/flights",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "flights"]
+						}
+					}
+				},
+				{
+					"name": "Get All Flights",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/flights?page=1&limit=20&sortBy=departureTime&order=asc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "flights"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"},
+								{"key": "sortBy", "value": "departureTime"},
+								{"key": "order", "value": "asc"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Flights with Filters",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/flights?departureAirportId=1&arrivalAirportId=2&status=scheduled&minPrice=200&maxPrice=500",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "flights"],
+							"query": [
+								{"key": "departureAirportId", "value": "1"},
+								{"key": "arrivalAirportId", "value": "2"},
+								{"key": "status", "value": "scheduled"},
+								{"key": "minPrice", "value": "200"},
+								{"key": "maxPrice", "value": "500"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Flight by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/flights/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "flights", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Flights by Status",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/flights/status/scheduled",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "flights", "status", "scheduled"]
+						}
+					}
+				},
+				{
+					"name": "Get Flights by Route",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/flights/route?departureAirportId=1&arrivalAirportId=2",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "flights", "route"],
+							"query": [
+								{"key": "departureAirportId", "value": "1"},
+								{"key": "arrivalAirportId", "value": "2"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Flight",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"boarding\",\n  \"boardingGate\": \"B15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/flights/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "flights", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Flight",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/flights/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "flights", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phone\": \"+1234567890\",\n  \"dateOfBirth\": \"1990-05-15\",\n  \"passportNumber\": \"AB1234567\",\n  \"nationality\": \"US\",\n  \"role\": \"customer\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "users"]
+						}
+					}
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/users?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "users"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/users/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "users", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get User by Email",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/users/email/john.doe@example.com",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "users", "email", "john.doe@example.com"]
+						}
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"+1987654321\",\n  \"firstName\": \"Jonathan\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/users/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "users", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/users/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "users", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Seats",
+			"item": [
+				{
+					"name": "Create Seat",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"airplaneId\": 1,\n  \"seatNumber\": \"12A\",\n  \"class\": \"economy\",\n  \"isWindowSeat\": true,\n  \"isAisleSeat\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/seats",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "seats"]
+						}
+					}
+				},
+				{
+					"name": "Get All Seats",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/seats?page=1&limit=50",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "seats"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "50"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Seats with Filters",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/seats?airplaneId=1&class=economy&isWindowSeat=true",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "seats"],
+							"query": [
+								{"key": "airplaneId", "value": "1"},
+								{"key": "class", "value": "economy"},
+								{"key": "isWindowSeat", "value": "true"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Seat by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/seats/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "seats", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Seats by Airplane",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/seats/airplane/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "seats", "airplane", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Seat",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"class\": \"business\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/seats/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "seats", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Seat",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/seats/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "seats", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Passengers",
+			"item": [
+				{
+					"name": "Create Passenger",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 1,\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"dateOfBirth\": \"1995-08-20\",\n  \"gender\": \"female\",\n  \"passportNumber\": \"CD9876543\",\n  \"nationality\": \"US\",\n  \"frequentFlyerNumber\": \"FF123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/passengers",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "passengers"]
+						}
+					}
+				},
+				{
+					"name": "Get All Passengers",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/passengers?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "passengers"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Passenger by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/passengers/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "passengers", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Passengers by User",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/passengers/user/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "passengers", "user", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Passenger",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"frequentFlyerNumber\": \"FF987654321\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/passengers/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "passengers", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Passenger",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/passengers/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "passengers", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 1,\n  \"bookingReference\": \"BK123ABC\",\n  \"totalAmount\": 599.98,\n  \"status\": \"confirmed\",\n  \"paymentStatus\": \"paid\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "bookings"]
+						}
+					}
+				},
+				{
+					"name": "Get All Bookings",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/bookings?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "bookings"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Bookings with Filters",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/bookings?userId=1&status=confirmed&paymentStatus=paid",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "bookings"],
+							"query": [
+								{"key": "userId", "value": "1"},
+								{"key": "status", "value": "confirmed"},
+								{"key": "paymentStatus", "value": "paid"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Booking by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "bookings", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Booking by Reference",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/reference/BK123ABC",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "bookings", "reference", "BK123ABC"]
+						}
+					}
+				},
+				{
+					"name": "Get Bookings by User",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/user/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "bookings", "user", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Booking",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"completed\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "bookings", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Booking",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "bookings", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Tickets",
+			"item": [
+				{
+					"name": "Create Ticket",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": 1,\n  \"flightId\": 1,\n  \"passengerId\": 1,\n  \"seatId\": 1,\n  \"ticketNumber\": \"TKT123456789\",\n  \"class\": \"economy\",\n  \"price\": 299.99,\n  \"status\": \"confirmed\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/tickets",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "tickets"]
+						}
+					}
+				},
+				{
+					"name": "Get All Tickets",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/tickets?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "tickets"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Tickets with Filters",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/tickets?bookingId=1&flightId=1&status=confirmed",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "tickets"],
+							"query": [
+								{"key": "bookingId", "value": "1"},
+								{"key": "flightId", "value": "1"},
+								{"key": "status", "value": "confirmed"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Ticket by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/tickets/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "tickets", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Ticket by Number",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/tickets/number/TKT123456789",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "tickets", "number", "TKT123456789"]
+						}
+					}
+				},
+				{
+					"name": "Get Tickets by Booking",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/tickets/booking/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "tickets", "booking", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Ticket",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"checked-in\",\n  \"seatId\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/tickets/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "tickets", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Ticket",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/tickets/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "tickets", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cities",
+			"item": [
+				{
+					"name": "Create City",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"New York\",\n  \"stateCode\": \"NY\",\n  \"countryCode\": \"US\",\n  \"population\": 8336817,\n  \"timezone\": \"America/New_York\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "cities"]
+						}
+					}
+				},
+				{
+					"name": "Get All Cities",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "cities"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get City by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "cities", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get City by Name",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/name/New York",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "cities", "name", "New York"]
+						}
+					}
+				},
+				{
+					"name": "Update City",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"population\": 8400000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "cities", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete City",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "cities", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Airplanes",
+			"item": [
+				{
+					"name": "Create Airplane",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"modelNumber\": \"Boeing737-800\",\n  \"capacity\": 189\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airplanes"]
+						}
+					}
+				},
+				{
+					"name": "Get All Airplanes",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airplanes"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Airplane by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airplanes", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Airplane",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"capacity\": 200\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airplanes", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Airplane",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "{{apiVersion}}", "airplanes", "1"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "apiVersion",
+			"value": "v1",
+			"type": "string"
+		}
+	]
+}

@@ -13,20 +13,44 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
     },
     stateCode: {
       type: DataTypes.STRING(10),
-      allowNull: true,
+      allowNull: false,
     },
     countryCode: {
       type: DataTypes.STRING(3),
       allowNull: false,
     },
-    population: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: true,
-    },
     timezone: {
       type: DataTypes.STRING(50),
       allowNull: false,
       defaultValue: 'UTC',
+    },
+    population: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
+    },
+    latitude: {
+      type: DataTypes.DECIMAL(10, 8),
+      allowNull: true,
+    },
+    longitude: {
+      type: DataTypes.DECIMAL(11, 8),
+      allowNull: true,
+    },
+    elevation: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'Elevation in meters above sea level',
+    },
+    localName: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      comment: 'Local language name of the city',
+    },
+    isMetroArea: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      comment: 'Whether this represents a metropolitan area',
     },
     createdAt: {
       type: DataTypes.DATE,

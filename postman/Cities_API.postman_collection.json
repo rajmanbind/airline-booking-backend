@@ -1,0 +1,333 @@
+{
+	"info": {
+		"_postman_id": "cities-api-collection",
+		"name": "Cities API",
+		"description": "Complete Cities API endpoints for airline booking system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create City",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"New York\",\n  \"stateCode\": \"NY\",\n  \"countryCode\": \"US\",\n  \"population\": 8336817,\n  \"timezone\": \"America/New_York\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities"
+					]
+				},
+				"description": "Create a new city with required fields: name, countryCode, timezone"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Cities",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities?page=1&limit=20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"description": "Page number (default: 1)"
+						},
+						{
+							"key": "limit",
+							"value": "20",
+							"description": "Items per page (default: 20)"
+						}
+					]
+				},
+				"description": "Get paginated list of all cities"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Cities with Filters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities?name=New&countryCode=US&minPopulation=1000000&page=1&limit=10&sortBy=population&order=desc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "New",
+							"description": "Search by city name (partial match)"
+						},
+						{
+							"key": "countryCode",
+							"value": "US",
+							"description": "Filter by country code"
+						},
+						{
+							"key": "minPopulation",
+							"value": "1000000",
+							"description": "Minimum population"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						},
+						{
+							"key": "sortBy",
+							"value": "population",
+							"description": "Sort by field (name, population, etc.)"
+						},
+						{
+							"key": "order",
+							"value": "desc",
+							"description": "Sort order (asc/desc)"
+						}
+					]
+				},
+				"description": "Get cities with filters: name, countryCode, stateCode, minPopulation, sorting"
+			},
+			"response": []
+		},
+		{
+			"name": "Get City by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities",
+						"1"
+					]
+				},
+				"description": "Get a specific city by ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Get City by Name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities/name/New York",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities",
+						"name",
+						"New York"
+					]
+				},
+				"description": "Get a city by exact name match"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Cities by Country",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities/country/US",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities",
+						"country",
+						"US"
+					]
+				},
+				"description": "Get all cities in a specific country (sorted by name)"
+			},
+			"response": []
+		},
+		{
+			"name": "Update City",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"New York City\",\n  \"population\": 8400000,\n  \"timezone\": \"America/New_York\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities",
+						"1"
+					]
+				},
+				"description": "Update a city (partial update - only send fields to update)"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete City",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities",
+						"1"
+					]
+				},
+				"description": "Delete a city by ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Validation Test - Missing Required Fields",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Test City\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities"
+					]
+				},
+				"description": "Test validation - should fail (missing countryCode and timezone)"
+			},
+			"response": []
+		},
+		{
+			"name": "Validation Test - Invalid Fields",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"invalidField\": \"test\",\n  \"anotherInvalid\": 123\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/cities/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"cities",
+						"1"
+					]
+				},
+				"description": "Test validation - should fail (invalid field names)"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "apiVersion",
+			"value": "v1",
+			"type": "string"
+		}
+	]
+}

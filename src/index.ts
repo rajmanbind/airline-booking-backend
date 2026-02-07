@@ -8,6 +8,12 @@ import { applySecurity, errorHandler } from "./middlewares";
 // Create app
 const app = express();
 
+// Trust proxy - enables correct IP tracking behind load balancer/proxy
+// Critical for rate limiting to work correctly in production
+if (ServerConfig.NODE_ENV === 'production') {
+  app.set('trust proxy', 1); // Trust first proxy (NGINX, CloudFlare, AWS ALB)
+}
+
 // Security + Middleware
 applySecurity(app);
 app.use(express.json());

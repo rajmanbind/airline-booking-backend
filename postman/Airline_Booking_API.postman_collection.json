@@ -1,0 +1,626 @@
+{
+	"info": {
+		"_postman_id": "airline-booking-api-collection",
+		"name": "Airline Booking API - Complete",
+		"description": "Complete API collection for Airline Booking System (Cities & Airplanes)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Cities API",
+			"item": [
+				{
+					"name": "Create City",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"New York\",\n  \"stateCode\": \"NY\",\n  \"countryCode\": \"US\",\n  \"population\": 8336817,\n  \"timezone\": \"America/New_York\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities"
+							]
+						},
+						"description": "Create a new city with required fields: name, countryCode, timezone"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities?page=1&limit=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (default: 20)"
+								}
+							]
+						},
+						"description": "Get paginated list of all cities"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cities with Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities?name=New&countryCode=US&minPopulation=1000000&page=1&limit=10&sortBy=population&order=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "New",
+									"description": "Search by city name (partial match)"
+								},
+								{
+									"key": "countryCode",
+									"value": "US",
+									"description": "Filter by country code"
+								},
+								{
+									"key": "stateCode",
+									"value": "",
+									"description": "Filter by state code",
+									"disabled": true
+								},
+								{
+									"key": "minPopulation",
+									"value": "1000000",
+									"description": "Minimum population"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "population",
+									"description": "Sort by field (name, population, etc.)"
+								},
+								{
+									"key": "order",
+									"value": "desc",
+									"description": "Sort order (asc/desc)"
+								}
+							]
+						},
+						"description": "Get cities with filters: name, countryCode, stateCode, minPopulation, sorting"
+					},
+					"response": []
+				},
+				{
+					"name": "Get City by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities",
+								"1"
+							]
+						},
+						"description": "Get a specific city by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get City by Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/name/New York",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities",
+								"name",
+								"New York"
+							]
+						},
+						"description": "Get a city by exact name match"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cities by Country",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/country/US",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities",
+								"country",
+								"US"
+							]
+						},
+						"description": "Get all cities in a specific country (sorted by name)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update City",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"New York City\",\n  \"population\": 8400000,\n  \"timezone\": \"America/New_York\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities",
+								"1"
+							]
+						},
+						"description": "Update a city (partial update - only send fields to update)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete City",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities",
+								"1"
+							]
+						},
+						"description": "Delete a city by ID"
+					},
+					"response": []
+				}
+			],
+			"description": "City management endpoints"
+		},
+		{
+			"name": "Airplanes API",
+			"item": [
+				{
+					"name": "Create Airplane",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"modelNumber\": \"Boeing737-800\",\n  \"capacity\": 189\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"airplanes"
+							]
+						},
+						"description": "Create a new airplane with required fields: modelNumber, capacity"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Airplanes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes?page=1&limit=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"airplanes"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (default: 20)"
+								}
+							]
+						},
+						"description": "Get paginated list of all airplanes"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airplanes with Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes?modelNumber=Boeing&minCapacity=150&page=1&limit=10&sortBy=capacity&order=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"airplanes"
+							],
+							"query": [
+								{
+									"key": "modelNumber",
+									"value": "Boeing",
+									"description": "Filter by model number"
+								},
+								{
+									"key": "minCapacity",
+									"value": "150",
+									"description": "Minimum capacity"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "capacity",
+									"description": "Sort by field (capacity, modelNumber, etc.)"
+								},
+								{
+									"key": "order",
+									"value": "desc",
+									"description": "Sort order (asc/desc)"
+								}
+							]
+						},
+						"description": "Get airplanes with filters: modelNumber, minCapacity, sorting"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airplane by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"airplanes",
+								"1"
+							]
+						},
+						"description": "Get a specific airplane by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Airplane",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"modelNumber\": \"Boeing737-900ER\",\n  \"capacity\": 220\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"airplanes",
+								"1"
+							]
+						},
+						"description": "Update an airplane (partial update - only send fields to update)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Airplane",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"airplanes",
+								"1"
+							]
+						},
+						"description": "Delete an airplane by ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Airplane fleet management endpoints"
+		},
+		{
+			"name": "Validation Tests",
+			"item": [
+				{
+					"name": "City - Missing Required Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test City\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities"
+							]
+						},
+						"description": "Test validation - should fail (missing countryCode and timezone)"
+					},
+					"response": []
+				},
+				{
+					"name": "City - Invalid Field Names",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"invalidField\": \"test\",\n  \"anotherInvalid\": 123\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/cities/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"cities",
+								"1"
+							]
+						},
+						"description": "Test validation - should fail (invalid field names)"
+					},
+					"response": []
+				},
+				{
+					"name": "Airplane - Missing Required Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"modelNumber\": \"TestModel\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"airplanes"
+							]
+						},
+						"description": "Test validation - should fail (missing capacity)"
+					},
+					"response": []
+				},
+				{
+					"name": "Airplane - Invalid Capacity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"modelNumber\": \"TestModel\",\n  \"capacity\": -50\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"airplanes"
+							]
+						},
+						"description": "Test validation - should fail (negative capacity)"
+					},
+					"response": []
+				},
+				{
+					"name": "Airplane - Invalid Field in Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"invalidField\": \"test\",\n  \"capacity\": 200\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/{{apiVersion}}/airplanes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"{{apiVersion}}",
+								"airplanes",
+								"1"
+							]
+						},
+						"description": "Test field whitelisting - should fail (invalid field name)"
+					},
+					"response": []
+				}
+			],
+			"description": "Validation and error handling test cases"
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Check if server is running"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "apiVersion",
+			"value": "v1",
+			"type": "string"
+		}
+	]
+}

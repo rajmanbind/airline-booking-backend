@@ -6,8 +6,13 @@ interface CityAttributes {
   name: string;
   stateCode: string;
   countryCode: string;
-  population?: number;
   timezone: string;
+  population?: number;
+  latitude?: number;
+  longitude?: number;
+  elevation?: number;
+  localName?: string;
+  isMetroArea?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -24,8 +29,13 @@ class City
   public name!: string;
   public stateCode!: string;
   public countryCode!: string;
-  public population!: number;
   public timezone!: string;
+  public population?: number;
+  public latitude?: number;
+  public longitude?: number;
+  public elevation?: number;
+  public localName?: string;
+  public isMetroArea?: boolean;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -42,23 +52,64 @@ export const initCityModel = (sequelize: Sequelize): typeof City => {
       name: {
         type: DataTypes.STRING(100),
         allowNull: false,
+        unique: true,
       },
       stateCode: {
         type: DataTypes.STRING(10),
-        allowNull: true,
+        allowNull: false,
       },
       countryCode: {
         type: DataTypes.STRING(3),
         allowNull: false,
       },
-      population: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: true,
-      },
       timezone: {
         type: DataTypes.STRING(50),
         allowNull: false,
         defaultValue: 'UTC',
+      },
+      population: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
+        validate: {
+          min: 0,
+          max: 50000000,
+        },
+      },
+      latitude: {
+        type: DataTypes.DECIMAL(10, 8),
+        allowNull: true,
+        validate: {
+          min: -90,
+          max: 90,
+        },
+      },
+      longitude: {
+        type: DataTypes.DECIMAL(11, 8),
+        allowNull: true,
+        validate: {
+          min: -180,
+          max: 180,
+        },
+      },
+      elevation: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: 'Elevation in meters above sea level',
+        validate: {
+          min: -500,
+          max: 9000,
+        },
+      },
+      localName: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+        comment: 'Local language name of the city',
+      },
+      isMetroArea: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+        comment: 'Whether this represents a metropolitan area',
       },
     },
     {

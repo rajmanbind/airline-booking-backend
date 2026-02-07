@@ -2,12 +2,13 @@ import { Logger } from "../config";
 import Airplane from "../models/Airlplane";
 import { CrudRepository } from "./crud-repositories";
 import { Op } from 'sequelize';
+import { CreateAirplaneDTO, AirplaneResponse } from "../types";
 
 export function AirplaneRepository() {
- const baseRepo = CrudRepository(Airplane);
+  const baseRepo = CrudRepository<Airplane, CreateAirplaneDTO>(Airplane);
 
   // Add domain-specific methods here
-  const getByModelNumber = async (modelNumber: string) => {
+  const getByModelNumber = async (modelNumber: string): Promise<Airplane | null> => {
     try {
       return await Airplane.findOne({ where: { modelNumber } });
     } catch (error) {
@@ -16,7 +17,7 @@ export function AirplaneRepository() {
     }
   };
 
-  const getLargeCapacityPlanes = async (minCapacity: number) => {
+  const getLargeCapacityPlanes = async (minCapacity: number): Promise<Airplane[]> => {
     try {
       return await Airplane.findAll({
         where: {
@@ -29,7 +30,7 @@ export function AirplaneRepository() {
     }
   };
 
-  const getAll = async (opts: { where?: any; limit?: number; offset?: number; order?: any } = {}) => {
+  const getAll = async (opts: { where?: any; limit?: number; offset?: number; order?: any } = {}): Promise<{ rows: Airplane[]; count: number }> => {
     try {
       const { where = {}, limit, offset, order = [['id', 'ASC']] } = opts;
       const result = await Airplane.findAndCountAll({ where, limit, offset, order });
