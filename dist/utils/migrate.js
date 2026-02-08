@@ -7,11 +7,8 @@ exports.runMigrations = runMigrations;
 const umzug_1 = require("umzug");
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../config/database"));
-// Detect if running from compiled code (dist/) or source (src/)
-const isCompiledCode = __filename.includes('/dist/');
-const migrationsGlob = isCompiledCode
-    ? path_1.default.join(process.cwd(), 'dist', 'migrations', '*.js')
-    : path_1.default.join(process.cwd(), 'src', 'migrations', '*.ts');
+// Always use TypeScript files in development for now
+const migrationsGlob = path_1.default.join(process.cwd(), 'src', 'migrations', '*.ts');
 const umzug = new umzug_1.Umzug({
     migrations: {
         glob: migrationsGlob,

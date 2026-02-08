@@ -1,10 +1,10 @@
-import ticketRepo from "../repositories/ticket-repository";
+import { TicketRepository } from "../repositories/ticket-repository";
 import models from "../models";
 import { Logger } from "../config";
 
 const { Ticket } = models;
+const ticketRepo = TicketRepository();
 import { AppError } from "../utils/errors/app-error";
-import { handleDatabaseError } from "../utils/errors/database-error-handler";
 import { StatusCodes } from "http-status-codes";
 import {
   CreateTicketDTO,
@@ -19,7 +19,7 @@ export const TicketService = {
     try {
       return await ticketRepo.create(data);
     } catch (error: any) {
-      handleDatabaseError(error, 'ticket creation');
+      throw error;
     }
   },
 
@@ -31,15 +31,23 @@ export const TicketService = {
       }
       return ticket;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'fetching ticket');
+      if (error.statusCode === StatusCodes.NOT_FOUND) {
+        throw new AppError("The ticket you requested is not present", StatusCodes.NOT_FOUND);
+      }
+      throw new AppError("Cannot fetch data of all tickets", StatusCodes.INTERNAL_SERVER_ERROR);
     }
   },
 
   async getAllTickets(params: TicketQueryParams): Promise<PaginatedTicketsResponse> {
     try {
       const { page = 1, limit = 20, sortBy = 'createdAt', order = 'desc', ...filters } = params;
-      const offset = (page - 1) * limit;
+      const parsedPage = Number.isFinite(Number(page)) ? Math.max(1, Number(page)) : 1;
+      const parsedLimit = Number.isFinite(Number(limit)) ? Math.max(1, Math.min(1000, Number(limit))) : 20;
+      const offset = (parsedPage - 1) * parsedLimit;
+
+      const allowedSorts = ['createdAt', 'ticketNumber', 'flightId'];
+      const sortColumn = typeof sortBy === 'string' && allowedSorts.includes(sortBy) ? sortBy : 'createdAt';
+      const orderDir = typeof order === 'string' && order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
 
       const where: any = {};
       if (filters.bookingId) where.bookingId = filters.bookingId;
@@ -51,22 +59,22 @@ export const TicketService = {
 
       const { count, rows } = await Ticket.findAndCountAll({
         where,
-        limit,
+        limit: parsedLimit,
         offset,
-        order: [[sortBy, order.toUpperCase()]]
+        order: [[sortColumn, orderDir]]
       });
 
       return {
         data: rows,
         pagination: {
           total: count,
-          page,
-          limit,
-          totalPages: Math.ceil(count / limit)
+          page: parsedPage,
+          limit: parsedLimit,
+          totalPages: Math.ceil(count / parsedLimit)
         }
       };
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching tickets');
+      throw error;
     }
   },
 
@@ -78,21 +86,19 @@ export const TicketService = {
       }
       return ticket;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'updating ticket');
+      throw error;
     }
   },
 
   async deleteTicket(id: number): Promise<boolean> {
     try {
       const result = await ticketRepo.destroy(id);
-      if (result === 0) {
-        throw new AppError('Ticket not found', StatusCodes.NOT_FOUND);
-      }
       return result > 0;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'deleting ticket');
+      if (error.statusCode === StatusCodes.NOT_FOUND) {
+        throw new AppError("The ticket you requested to delete is not present", StatusCodes.NOT_FOUND);
+      }
+      throw error;
     }
   },
 
@@ -100,7 +106,7 @@ export const TicketService = {
     try {
       return await ticketRepo.getByBookingId(bookingId);
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching tickets by booking');
+      throw error;
     }
   },
 
@@ -108,7 +114,7 @@ export const TicketService = {
     try {
       return await ticketRepo.getByFlightId(flightId);
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching tickets by flight');
+      throw error;
     }
   },
 
@@ -116,7 +122,7 @@ export const TicketService = {
     try {
       return await ticketRepo.getByPassengerId(passengerId);
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching tickets by passenger');
+      throw error;
     }
   },
 
@@ -128,8 +134,7 @@ export const TicketService = {
       }
       return ticket;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'fetching ticket by number');
+      throw error;
     }
   }
 };

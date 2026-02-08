@@ -1,8 +1,7 @@
-import seatRepo from "../repositories/seat-repository";
+import { SeatRepository } from "../repositories/seat-repository";
 import models from "../models";
 import { Logger } from "../config";
 import { AppError } from "../utils/errors/app-error";
-import { handleDatabaseError } from "../utils/errors/database-error-handler";
 import { StatusCodes } from "http-status-codes";
 import {
   CreateSeatDTO,
@@ -13,33 +12,39 @@ import {
 } from "../types";
 
 const { Seat } = models;
+const seatRepo = SeatRepository();
 
 export const SeatService = {
   async createSeat(data: CreateSeatDTO): Promise<SeatResponse> {
     try {
       return await seatRepo.create(data);
     } catch (error: any) {
-      handleDatabaseError(error, 'seat creation');
+      throw error;
     }
   },
 
   async getSeatById(id: number): Promise<SeatResponse> {
     try {
       const seat = await seatRepo.getById(id);
-      if (!seat) {
-        throw new AppError('Seat not found', StatusCodes.NOT_FOUND);
-      }
       return seat;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'fetching seat');
+      if (error.statusCode === StatusCodes.NOT_FOUND) {
+        throw new AppError("The seat you requested is not present", StatusCodes.NOT_FOUND);
+      }
+      throw new AppError("Cannot fetch data of all seats", StatusCodes.INTERNAL_SERVER_ERROR);
     }
   },
 
   async getAllSeats(params: SeatQueryParams): Promise<PaginatedSeatsResponse> {
     try {
       const { page = 1, limit = 50, sortBy = 'seatNumber', order = 'asc', ...filters } = params;
-      const offset = (page - 1) * limit;
+      const parsedPage = Number.isFinite(Number(page)) ? Math.max(1, Number(page)) : 1;
+      const parsedLimit = Number.isFinite(Number(limit)) ? Math.max(1, Math.min(1000, Number(limit))) : 50;
+      const offset = (parsedPage - 1) * parsedLimit;
+
+      const allowedSorts = ['seatNumber', 'createdAt', 'updatedAt'];
+      const sortColumn = typeof sortBy === 'string' && allowedSorts.includes(sortBy) ? sortBy : 'seatNumber';
+      const orderDir = typeof order === 'string' && order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
 
       const where: any = {};
       if (filters.airplaneId) where.airplaneId = filters.airplaneId;
@@ -50,48 +55,43 @@ export const SeatService = {
 
       const { count, rows } = await Seat.findAndCountAll({
         where,
-        limit,
+        limit: parsedLimit,
         offset,
-        order: [[sortBy, order.toUpperCase()]]
+        order: [[sortColumn, orderDir]]
       });
 
       return {
         data: rows,
         pagination: {
           total: count,
-          page,
-          limit,
-          totalPages: Math.ceil(count / limit)
+          page: parsedPage,
+          limit: parsedLimit,
+          totalPages: Math.ceil(count / parsedLimit)
         }
       };
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching seats');
+      throw error;
     }
   },
 
   async updateSeat(id: number, data: UpdateSeatDTO): Promise<SeatResponse> {
     try {
       const seat = await seatRepo.update(id, data);
-      if (!seat) {
-        throw new AppError('Seat not found', StatusCodes.NOT_FOUND);
-      }
       return seat;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'updating seat');
+      throw error;
     }
   },
 
   async deleteSeat(id: number): Promise<boolean> {
     try {
       const result = await seatRepo.destroy(id);
-      if (result === 0) {
-        throw new AppError('Seat not found', StatusCodes.NOT_FOUND);
-      }
       return result > 0;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'deleting seat');
+      if (error.statusCode === StatusCodes.NOT_FOUND) {
+        throw new AppError("The seat you requested to delete is not present", StatusCodes.NOT_FOUND);
+      }
+      throw error;
     }
   },
 
@@ -99,7 +99,7 @@ export const SeatService = {
     try {
       return await seatRepo.getByAirplane(airplaneId);
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching seats by airplane');
+      throw error;
     }
   },
 
@@ -107,7 +107,7 @@ export const SeatService = {
     try {
       return await seatRepo.getByClass(airplaneId, seatClass);
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching seats by class');
+      throw error;
     }
   },
 
@@ -115,7 +115,7 @@ export const SeatService = {
     try {
       return await seatRepo.getWindowSeats(airplaneId);
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching window seats');
+      throw error;
     }
   },
 
@@ -123,7 +123,7 @@ export const SeatService = {
     try {
       return await seatRepo.getAisleSeats(airplaneId);
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching aisle seats');
+      throw error;
     }
   }
 };

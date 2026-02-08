@@ -1,67 +1,58 @@
 import models from '../models';
+import { Logger } from '../config';
 import { CreateAirportDTO } from '../types';
 import { CrudRepository } from './crud-repositories';
 import { Op } from 'sequelize';
 
 type Airport = typeof models.Airport extends { prototype: infer T } ? T : never;
 
-class AirportRepository {
-  private crudRepo: ReturnType<typeof CrudRepository<Airport, CreateAirportDTO>>;
+export function AirportRepository() {
+  const baseRepo = CrudRepository<Airport, CreateAirportDTO>(models.Airport);
 
-  constructor() {
-    this.crudRepo = CrudRepository<Airport, CreateAirportDTO>(models.Airport);
-  }
+  const getByCode = async (code: string): Promise<Airport | null> => {
+    try {
+      return await models.Airport.findOne({ where: { code: code.toUpperCase() } });
+    } catch (error) {
+      Logger.error('Something went wrong in AirportRepo: getByCode', error);
+      throw error;
+    }
+  };
 
-  async create(data: CreateAirportDTO): Promise<Airport> {
-    return await this.crudRepo.create(data);
-  }
+  const getByCityId = async (cityId: number): Promise<Airport[]> => {
+    try {
+      return await models.Airport.findAll({ where: { cityId }, order: [['name', 'ASC']] });
+    } catch (error) {
+      Logger.error('Something went wrong in AirportRepo: getByCityId', error);
+      throw error;
+    }
+  };
 
-  async getAll(filter: any = {}): Promise<Airport[]> {
-    return await this.crudRepo.findAll(filter);
-  }
+  const getByTimezone = async (timezone: string): Promise<Airport[]> => {
+    try {
+      return await models.Airport.findAll({ where: { timezone }, order: [['name', 'ASC']] });
+    } catch (error) {
+      Logger.error('Something went wrong in AirportRepo: getByTimezone', error);
+      throw error;
+    }
+  };
 
-  async getById(id: number): Promise<Airport | null> {
-    return await this.crudRepo.getById(id);
-  }
+  const searchByName = async (name: string): Promise<Airport[]> => {
+    try {
+      return await baseRepo.findAll({
+        where: { name: { [Op.like]: `%${name}%` } },
+        order: [['name', 'ASC']],
+      });
+    } catch (error) {
+      Logger.error('Something went wrong in AirportRepo: searchByName', error);
+      throw error;
+    }
+  };
 
-  async update(id: number, data: Partial<CreateAirportDTO>): Promise<Airport | null> {
-    return await this.crudRepo.update(id, data);
-  }
-
-  async destroy(id: number): Promise<number> {
-    return await this.crudRepo.destroy(id);
-  }
-
-  async getByCode(code: string): Promise<Airport | null> {
-    return await models.Airport.findOne({
-      where: { code: code.toUpperCase() }
-    });
-  }
-
-  async getByCityId(cityId: number): Promise<Airport[]> {
-    return await models.Airport.findAll({
-      where: { cityId },
-      order: [['name', 'ASC']]
-    });
-  }
-
-  async getByTimezone(timezone: string): Promise<Airport[]> {
-    return await models.Airport.findAll({
-      where: { timezone },
-      order: [['name', 'ASC']]
-    });
-  }
-
-  async searchByName(name: string): Promise<Airport[]> {
-    return await models.Airport.findAll({
-      where: {
-        name: {
-          [Op.like]: `%${name}%`
-        }
-      },
-      order: [['name', 'ASC']]
-    });
-  }
+  return {
+    ...baseRepo,
+    getByCode,
+    getByCityId,
+    getByTimezone,
+    searchByName,
+  };
 }
-
-export default new AirportRepository();

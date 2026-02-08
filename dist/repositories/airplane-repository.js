@@ -33,7 +33,7 @@ function AirplaneRepository() {
             throw error;
         }
     };
-    const getAllAirplanes = async (opts = {}) => {
+    const getAll = async (opts = {}) => {
         try {
             const { where = {}, limit, offset, order = [['id', 'ASC']] } = opts;
             const result = await Airlplane_1.default.findAndCountAll({ where, limit, offset, order });
@@ -43,7 +43,7 @@ function AirplaneRepository() {
             };
         }
         catch (error) {
-            config_1.Logger.error('Something went wrong in AirplaneRepo: getAllAirplanes', error);
+            config_1.Logger.error('Something went wrong in AirplaneRepo: getAll', error);
             throw error;
         }
     };
@@ -51,6 +51,6 @@ function AirplaneRepository() {
         ...baseRepo,
         getByModelNumber,
         getLargeCapacityPlanes,
-        getAllAirplanes,
+        getAll,
     };
 }

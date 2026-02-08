@@ -2,67 +2,54 @@ import models from '../models';
 import { CreateUserDTO } from '../types';
 import { CrudRepository } from './crud-repositories';
 import { Op } from 'sequelize';
+import { Logger } from '../config';
 
 type User = typeof models.User extends { prototype: infer T } ? T : never;
 
-class UserRepository {
-  private crudRepo: ReturnType<typeof CrudRepository<User, CreateUserDTO>>;
+export function UserRepository() {
+  const baseRepo = CrudRepository<User, CreateUserDTO>(models.User);
 
-  constructor() {
-    this.crudRepo = CrudRepository<User, CreateUserDTO>(models.User);
-  }
+  const getByEmail = async (email: string): Promise<User | null> => {
+    try {
+      return await models.User.findOne({ where: { email: email.toLowerCase() } });
+    } catch (error) {
+      Logger.error('Something went wrong in UserRepo: getByEmail', error);
+      throw error;
+    }
+  };
 
-  async create(data: CreateUserDTO): Promise<User> {
-    return await this.crudRepo.create(data);
-  }
+  const getByRole = async (role: string): Promise<User[]> => {
+    try {
+      return await models.User.findAll({ where: { role }, order: [['createdAt', 'DESC']] });
+    } catch (error) {
+      Logger.error('Something went wrong in UserRepo: getByRole', error);
+      throw error;
+    }
+  };
 
-  async getAll(filter: any = {}): Promise<User[]> {
-    return await this.crudRepo.findAll(filter);
-  }
+  const getByNationality = async (nationality: string): Promise<User[]> => {
+    try {
+      return await models.User.findAll({ where: { nationality }, order: [['lastName', 'ASC'], ['firstName', 'ASC']] });
+    } catch (error) {
+      Logger.error('Something went wrong in UserRepo: getByNationality', error);
+      throw error;
+    }
+  };
 
-  async getById(id: number): Promise<User | null> {
-    return await this.crudRepo.getById(id);
-  }
+  const searchByName = async (name: string): Promise<User[]> => {
+    try {
+      return await baseRepo.findAll({ where: { [Op.or]: [ { firstName: { [Op.like]: `%${name}%` } }, { lastName: { [Op.like]: `%${name}%` } } ] }, order: [['lastName', 'ASC'], ['firstName', 'ASC']] });
+    } catch (error) {
+      Logger.error('Something went wrong in UserRepo: searchByName', error);
+      throw error;
+    }
+  };
 
-  async update(id: number, data: Partial<CreateUserDTO>): Promise<User | null> {
-    return await this.crudRepo.update(id, data);
-  }
-
-  async destroy(id: number): Promise<number> {
-    return await this.crudRepo.destroy(id);
-  }
-
-  async getByEmail(email: string): Promise<User | null> {
-    return await models.User.findOne({
-      where: { email: email.toLowerCase() }
-    });
-  }
-
-  async getByRole(role: string): Promise<User[]> {
-    return await models.User.findAll({
-      where: { role },
-      order: [['createdAt', 'DESC']]
-    });
-  }
-
-  async getByNationality(nationality: string): Promise<User[]> {
-    return await models.User.findAll({
-      where: { nationality },
-      order: [['lastName', 'ASC'], ['firstName', 'ASC']]
-    });
-  }
-
-  async searchByName(name: string): Promise<User[]> {
-    return await models.User.findAll({
-      where: {
-        [Op.or]: [
-          { firstName: { [Op.like]: `%${name}%` } },
-          { lastName: { [Op.like]: `%${name}%` } }
-        ]
-      },
-      order: [['lastName', 'ASC'], ['firstName', 'ASC']]
-    });
-  }
+  return {
+    ...baseRepo,
+    getByEmail,
+    getByRole,
+    getByNationality,
+    searchByName,
+  };
 }
-
-export default new UserRepository();

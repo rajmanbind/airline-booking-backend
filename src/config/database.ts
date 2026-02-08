@@ -27,7 +27,7 @@ const config: Record<string, DbConfig> = {
     host: ServerConfig.DB_HOST,
     port: ServerConfig.DB_PORT,
     dialect: 'mysql',
-    logging: console.log,
+    // logging: console.log,
     // Connection pooling for development (smaller but still efficient)
     pool: {
       max: Number(process.env.DB_POOL_MAX) || 20, // Max connections

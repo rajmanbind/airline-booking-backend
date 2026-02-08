@@ -4,78 +4,55 @@ import { CrudRepository } from './crud-repositories';
 
 type Seat = typeof models.Seat extends { prototype: infer T } ? T : never;
 
-class SeatRepository {
-  private crudRepo: ReturnType<typeof CrudRepository<Seat, CreateSeatDTO>>;
+export function SeatRepository() {
+  const baseRepo = CrudRepository<Seat, CreateSeatDTO>(models.Seat);
 
-  constructor() {
-    this.crudRepo = CrudRepository<Seat, CreateSeatDTO>(models.Seat);
-  }
+  const getByAirplane = async (airplaneId: number): Promise<Seat[]> => {
+    try {
+      return await models.Seat.findAll({ where: { airplaneId }, order: [['seatNumber', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async create(data: CreateSeatDTO): Promise<Seat> {
-    return await this.crudRepo.create(data);
-  }
+  const getByClass = async (airplaneId: number, seatClass: string): Promise<Seat[]> => {
+    try {
+      return await models.Seat.findAll({ where: { airplaneId, class: seatClass }, order: [['seatNumber', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async getAll(filter: any = {}): Promise<Seat[]> {
-    return await this.crudRepo.findAll(filter);
-  }
+  const getWindowSeats = async (airplaneId: number): Promise<Seat[]> => {
+    try {
+      return await models.Seat.findAll({ where: { airplaneId, isWindowSeat: true }, order: [['seatNumber', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async getById(id: number): Promise<Seat | null> {
-    return await this.crudRepo.getById(id);
-  }
+  const getAisleSeats = async (airplaneId: number): Promise<Seat[]> => {
+    try {
+      return await models.Seat.findAll({ where: { airplaneId, isAisleSeat: true }, order: [['seatNumber', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async update(id: number, data: Partial<CreateSeatDTO>): Promise<Seat | null> {
-    return await this.crudRepo.update(id, data);
-  }
+  const getBySeatNumber = async (airplaneId: number, seatNumber: string): Promise<Seat | null> => {
+    try {
+      return await models.Seat.findOne({ where: { airplaneId, seatNumber } });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async destroy(id: number): Promise<number> {
-    return await this.crudRepo.destroy(id);
-  }
-
-  async getByAirplane(airplaneId: number): Promise<Seat[]> {
-    return await models.Seat.findAll({
-      where: { airplaneId },
-      order: [['seatNumber', 'ASC']]
-    });
-  }
-
-  async getByClass(airplaneId: number, seatClass: string): Promise<Seat[]> {
-    return await models.Seat.findAll({
-      where: {
-        airplaneId,
-        class: seatClass
-      },
-      order: [['seatNumber', 'ASC']]
-    });
-  }
-
-  async getWindowSeats(airplaneId: number): Promise<Seat[]> {
-    return await models.Seat.findAll({
-      where: {
-        airplaneId,
-        isWindowSeat: true
-      },
-      order: [['seatNumber', 'ASC']]
-    });
-  }
-
-  async getAisleSeats(airplaneId: number): Promise<Seat[]> {
-    return await models.Seat.findAll({
-      where: {
-        airplaneId,
-        isAisleSeat: true
-      },
-      order: [['seatNumber', 'ASC']]
-    });
-  }
-
-  async getBySeatNumber(airplaneId: number, seatNumber: string): Promise<Seat | null> {
-    return await models.Seat.findOne({
-      where: {
-        airplaneId,
-        seatNumber
-      }
-    });
-  }
+  return {
+    ...baseRepo,
+    getByAirplane,
+    getByClass,
+    getWindowSeats,
+    getAisleSeats,
+    getBySeatNumber,
+  };
 }
-
-export default new SeatRepository();

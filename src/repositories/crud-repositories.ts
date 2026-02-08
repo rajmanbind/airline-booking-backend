@@ -58,12 +58,63 @@ export function CrudRepository<T extends Model, TCreationAttributes = Partial<T>
   };
 
   const findAll = async (options: FindOptions<T> = {}): Promise<T[]> => {
-    const response = await model.findAll(options);
+    const safeOptions = { ...options } as any;
+    if (safeOptions.limit !== undefined) {
+      const l = Number(safeOptions.limit);
+      safeOptions.limit = Number.isFinite(l) ? Math.max(1, Math.floor(l)) : undefined;
+    }
+    if (safeOptions.offset !== undefined) {
+      const o = Number(safeOptions.offset);
+      safeOptions.offset = Number.isFinite(o) ? Math.max(0, Math.floor(o)) : undefined;
+    }
+    if (safeOptions.order) {
+      try {
+        if (Array.isArray(safeOptions.order)) {
+          safeOptions.order = safeOptions.order.map((entry: any) => {
+            if (Array.isArray(entry) && entry.length >= 2) {
+              const dir = String(entry[1]).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+              return [entry[0], dir];
+            }
+            return entry;
+          });
+        }
+      } catch (e) {
+        // fallback: remove order if malformed
+        delete safeOptions.order;
+      }
+    }
+
+    const response = await model.findAll(safeOptions);
     return response;
   };
 
   const findAndCountAll = async (options: FindOptions<T> = {}): Promise<{ rows: T[]; count: number }> => {
-    const response = await model.findAndCountAll(options);
+    const safeOptions = { ...options } as any;
+    if (safeOptions.limit !== undefined) {
+      const l = Number(safeOptions.limit);
+      safeOptions.limit = Number.isFinite(l) ? Math.max(1, Math.floor(l)) : undefined;
+    }
+    if (safeOptions.offset !== undefined) {
+      const o = Number(safeOptions.offset);
+      safeOptions.offset = Number.isFinite(o) ? Math.max(0, Math.floor(o)) : undefined;
+    }
+    if (safeOptions.order) {
+      try {
+        if (Array.isArray(safeOptions.order)) {
+          safeOptions.order = safeOptions.order.map((entry: any) => {
+            if (Array.isArray(entry) && entry.length >= 2) {
+              const dir = String(entry[1]).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+              return [entry[0], dir];
+            }
+            return entry;
+          });
+        }
+      } catch (e) {
+        delete safeOptions.order;
+      }
+    }
+
+    const response = await model.findAndCountAll(safeOptions);
     return response;
   };
 

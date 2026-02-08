@@ -15,7 +15,14 @@ const config = {
         host: servier_config_1.default.DB_HOST,
         port: servier_config_1.default.DB_PORT,
         dialect: 'mysql',
-        logging: console.log,
+        // logging: console.log,
+        // Connection pooling for development (smaller but still efficient)
+        pool: {
+            max: Number(process.env.DB_POOL_MAX) || 20, // Max connections
+            min: Number(process.env.DB_POOL_MIN) || 5, // Min idle connections
+            acquire: Number(process.env.DB_POOL_ACQUIRE) || 30000, // Max time to get connection
+            idle: Number(process.env.DB_POOL_IDLE) || 10000, // Max idle time before release
+        },
     },
     test: {
         database: servier_config_1.default.DB_NAME_TEST,
@@ -25,6 +32,13 @@ const config = {
         port: servier_config_1.default.DB_PORT,
         dialect: 'mysql',
         logging: false,
+        // Minimal pooling for tests
+        pool: {
+            max: 5,
+            min: 0,
+            acquire: 30000,
+            idle: 10000,
+        },
     },
     production: {
         database: servier_config_1.default.DB_NAME,
@@ -34,11 +48,12 @@ const config = {
         port: servier_config_1.default.DB_PORT,
         dialect: 'mysql',
         logging: false,
+        // Production-ready connection pooling
         pool: {
-            max: 5,
-            min: 0,
-            acquire: 30000,
-            idle: 10000,
+            max: Number(process.env.DB_POOL_MAX) || 100, // High concurrency support
+            min: Number(process.env.DB_POOL_MIN) || 10, // Always maintain minimum connections
+            acquire: Number(process.env.DB_POOL_ACQUIRE) || 60000, // 60s timeout for getting connection
+            idle: Number(process.env.DB_POOL_IDLE) || 10000, // Release idle connections after 10s
         },
     },
 };

@@ -1,7 +1,6 @@
 import { CityRepository } from "../repositories/city-repository";
 import { Logger } from "../config";
 import { AppError } from "../utils/errors/app-error";
-import { handleDatabaseError } from "../utils/errors/database-error-handler";
 import { Op } from "sequelize";
 import { StatusCodes } from "http-status-codes";
 import {
@@ -18,8 +17,8 @@ export const CityService = {
   async createCity(data: CreateCityDTO): Promise<CityResponse> {
     try {
       return await cityRepo.create(data);
-    } catch (error: any) {
-      handleDatabaseError(error, 'city creation');
+      } catch (error: any) {
+        throw error;
     }
   },
 
@@ -98,20 +97,20 @@ export const CityService = {
       await cityRepo.update(id, data);
       const updatedCity = await cityRepo.getById(id);
       return updatedCity;
-    } catch (error: any) {
-      handleDatabaseError(error, 'city update');
+      } catch (error: any) {
+        throw error;
     }
   },
 
   async deleteCity(id: number): Promise<boolean> {
     try {
-      const result = await cityRepo.destroy(id);
-      return result > 0; // destroy returns number of deleted rows
+      const result = await cityRepo.deleteById(id);
+      return result ;
     } catch (error: any) {
       if (error.statusCode === StatusCodes.NOT_FOUND) {
         throw new AppError("The city you want to delete is not present", StatusCodes.NOT_FOUND);
       }
-      handleDatabaseError(error, 'city deletion');
+ throw error;
     }
   },
 

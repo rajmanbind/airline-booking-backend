@@ -1,7 +1,5 @@
 import { AirplaneRepository } from "../repositories/airplane-repository";
-import { Logger } from "../config";
 import { AppError } from "../utils/errors/app-error";
-import { handleDatabaseError } from "../utils/errors/database-error-handler";
 import { Op } from "sequelize";
 import { StatusCodes } from "http-status-codes";
 import {
@@ -19,20 +17,20 @@ export const AirplaneService = {
     try {
       return await airplaneRepo.create(data);
     } catch (error: any) {
-      handleDatabaseError(error, 'airplane creation');
+      throw error;
     }
   },
 
   async getAirplaneById(id: number): Promise<AirplaneResponse> {
     try {
       const response = await airplaneRepo.getById(id);
-    
       return response;
-    } catch (error:any) {
-        if(error.statusCode===StatusCodes.NOT_FOUND){
-          throw  new AppError("The airplane you requested is not present", StatusCodes.NOT_FOUND);
-        }
-    throw new AppError("Cannot fetch data of all airplanes", StatusCodes.INTERNAL_SERVER_ERROR);
+    } catch (error: any) {
+      if (error.statusCode === StatusCodes.NOT_FOUND) {
+        throw new AppError("The airplane you requested is not present", StatusCodes.NOT_FOUND);
+      }
+      // Rethrow unexpected errors so global error handler can map/log them
+      throw error;
     }
   },
 
@@ -96,21 +94,20 @@ export const AirplaneService = {
       if (error.statusCode === StatusCodes.NOT_FOUND) {
         throw new AppError("The airplane you requested to update is not present", StatusCodes.NOT_FOUND);
       }
-      handleDatabaseError(error, 'airplane update');
+      throw error;
     }
   },
 
-  async deleteAirplane(id: number): Promise<void> {
+  async deleteAirplane(id: number): Promise<boolean> {
     try {
-      await airplaneRepo.deleteById(id);
-      return;
+      const result = await airplaneRepo.deleteById(id);
+      return result;
     } catch (error:any) {
       if (error.statusCode === StatusCodes.NOT_FOUND) {
         throw new AppError("The airplane you requested to delete is not present", StatusCodes.NOT_FOUND);
       }
+      throw error;
       
-      const message = error instanceof Error ? error.message : "Internal Server Error";
-      throw new AppError([message], StatusCodes.INTERNAL_SERVER_ERROR);
     }
   },
 };

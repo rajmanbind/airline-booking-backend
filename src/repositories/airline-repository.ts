@@ -2,59 +2,44 @@ import models from '../models';
 import { CreateAirlineDTO } from '../types';
 import { CrudRepository } from './crud-repositories';
 import { Op } from 'sequelize';
+import { Logger } from '../config';
 
 type Airline = typeof models.Airline extends { prototype: infer T } ? T : never;
 
-class AirlineRepository {
-  private crudRepo: ReturnType<typeof CrudRepository<Airline, CreateAirlineDTO>>;
+export function AirlineRepository() {
+  const baseRepo = CrudRepository<Airline, CreateAirlineDTO>(models.Airline);
 
-  constructor() {
-    this.crudRepo = CrudRepository<Airline, CreateAirlineDTO>(models.Airline);
-  }
+  const getByCode = async (code: string): Promise<Airline | null> => {
+    try {
+      return await models.Airline.findOne({ where: { code: code.toUpperCase() } });
+    } catch (error) {
+      Logger.error('Something went wrong in AirlineRepo: getByCode', error);
+      throw error;
+    }
+  };
 
-  async create(data: CreateAirlineDTO): Promise<Airline> {
-    return await this.crudRepo.create(data);
-  }
+  const getByCountry = async (country: string): Promise<Airline[]> => {
+    try {
+      return await models.Airline.findAll({ where: { country }, order: [['name', 'ASC']] });
+    } catch (error) {
+      Logger.error('Something went wrong in AirlineRepo: getByCountry', error);
+      throw error;
+    }
+  };
 
-  async getAll(filter: any = {}): Promise<Airline[]> {
-    return await this.crudRepo.findAll(filter);
-  }
+  const searchByName = async (name: string): Promise<Airline[]> => {
+    try {
+      return await baseRepo.findAll({ where: { name: { [Op.like]: `%${name}%` } }, order: [['name', 'ASC']] });
+    } catch (error) {
+      Logger.error('Something went wrong in AirlineRepo: searchByName', error);
+      throw error;
+    }
+  };
 
-  async getById(id: number): Promise<Airline | null> {
-    return await this.crudRepo.getById(id);
-  }
-
-  async update(id: number, data: Partial<CreateAirlineDTO>): Promise<Airline | null> {
-    return await this.crudRepo.update(id, data);
-  }
-
-  async destroy(id: number): Promise<number> {
-    return await this.crudRepo.destroy(id);
-  }
-
-  async getByCode(code: string): Promise<Airline | null> {
-    return await models.Airline.findOne({
-      where: { code: code.toUpperCase() }
-    });
-  }
-
-  async getByCountry(country: string): Promise<Airline[]> {
-    return await models.Airline.findAll({
-      where: { country },
-      order: [['name', 'ASC']]
-    });
-  }
-
-  async searchByName(name: string): Promise<Airline[]> {
-    return await models.Airline.findAll({
-      where: {
-        name: {
-          [Op.like]: `%${name}%`
-        }
-      },
-      order: [['name', 'ASC']]
-    });
-  }
+  return {
+    ...baseRepo,
+    getByCode,
+    getByCountry,
+    searchByName,
+  };
 }
-
-export default new AirlineRepository();

@@ -1,10 +1,10 @@
 export * from "./airplane-repository";
 export * from "./city-repository";
-export { default as airlineRepo } from "./airline-repository";
-export { default as airportRepo } from "./airport-repository";
-export { default as flightRepo } from "./flight-repository";
-export { default as userRepo } from "./user-repository";
-export { default as seatRepo } from "./seat-repository";
-export { default as passengerRepo } from "./passenger-repository";
-export { default as bookingRepo } from "./booking-repository";
-export { default as ticketRepo } from "./ticket-repository";
+export { AirlineRepository } from "./airline-repository";
+export { AirportRepository } from "./airport-repository";
+export { FlightRepository } from "./flight-repository";
+export { UserRepository } from "./user-repository";
+export { SeatRepository } from "./seat-repository";
+export { PassengerRepository } from "./passenger-repository";
+export { BookingRepository } from "./booking-repository";
+export { TicketRepository } from "./ticket-repository";

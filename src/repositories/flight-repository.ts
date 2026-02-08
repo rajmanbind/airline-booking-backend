@@ -5,85 +5,64 @@ import { Op } from 'sequelize';
 
 type Flight = typeof models.Flight extends { prototype: infer T } ? T : never;
 
-class FlightRepository {
-  private crudRepo: ReturnType<typeof CrudRepository<Flight, CreateFlightDTO>>;
+export function FlightRepository() {
+  const baseRepo = CrudRepository<Flight, CreateFlightDTO>(models.Flight);
 
-  constructor() {
-    this.crudRepo = CrudRepository<Flight, CreateFlightDTO>(models.Flight);
-  }
+  const getByFlightNumber = async (flightNumber: string): Promise<Flight[]> => {
+    try {
+      return await models.Flight.findAll({ where: { flightNumber }, order: [['departureTime', 'DESC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async create(data: CreateFlightDTO): Promise<Flight> {
-    return await this.crudRepo.create(data);
-  }
+  const getByAirline = async (airlineId: number): Promise<Flight[]> => {
+    try {
+      return await models.Flight.findAll({ where: { airlineId }, order: [['departureTime', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async getAll(filter: any = {}): Promise<Flight[]> {
-    return await this.crudRepo.findAll(filter);
-  }
+  const getByRoute = async (departureAirportId: number, arrivalAirportId: number): Promise<Flight[]> => {
+    try {
+      return await models.Flight.findAll({ where: { departureAirportId, arrivalAirportId }, order: [['departureTime', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async getById(id: number): Promise<Flight | null> {
-    return await this.crudRepo.getById(id);
-  }
+  const getByStatus = async (status: string): Promise<Flight[]> => {
+    try {
+      return await models.Flight.findAll({ where: { status }, order: [['departureTime', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async update(id: number, data: Partial<CreateFlightDTO>): Promise<Flight | null> {
-    return await this.crudRepo.update(id, data);
-  }
+  const getByDateRange = async (startDate: Date, endDate: Date): Promise<Flight[]> => {
+    try {
+      return await models.Flight.findAll({ where: { departureTime: { [Op.between]: [startDate, endDate] } }, order: [['departureTime', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async destroy(id: number): Promise<number> {
-    return await this.crudRepo.destroy(id);
-  }
+  const getByPriceRange = async (minPrice: number, maxPrice: number): Promise<Flight[]> => {
+    try {
+      return await models.Flight.findAll({ where: { price: { [Op.between]: [minPrice, maxPrice] } }, order: [['price', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async getByFlightNumber(flightNumber: string): Promise<Flight[]> {
-    return await models.Flight.findAll({
-      where: { flightNumber },
-      order: [['departureTime', 'DESC']]
-    });
-  }
-
-  async getByAirline(airlineId: number): Promise<Flight[]> {
-    return await models.Flight.findAll({
-      where: { airlineId },
-      order: [['departureTime', 'ASC']]
-    });
-  }
-
-  async getByRoute(departureAirportId: number, arrivalAirportId: number): Promise<Flight[]> {
-    return await models.Flight.findAll({
-      where: {
-        departureAirportId,
-        arrivalAirportId
-      },
-      order: [['departureTime', 'ASC']]
-    });
-  }
-
-  async getByStatus(status: string): Promise<Flight[]> {
-    return await models.Flight.findAll({
-      where: { status },
-      order: [['departureTime', 'ASC']]
-    });
-  }
-
-  async getByDateRange(startDate: Date, endDate: Date): Promise<Flight[]> {
-    return await models.Flight.findAll({
-      where: {
-        departureTime: {
-          [Op.between]: [startDate, endDate]
-        }
-      },
-      order: [['departureTime', 'ASC']]
-    });
-  }
-
-  async getByPriceRange(minPrice: number, maxPrice: number): Promise<Flight[]> {
-    return await models.Flight.findAll({
-      where: {
-        price: {
-          [Op.between]: [minPrice, maxPrice]
-        }
-      },
-      order: [['price', 'ASC']]
-    });
-  }
+  return {
+    ...baseRepo,
+    getByFlightNumber,
+    getByAirline,
+    getByRoute,
+    getByStatus,
+    getByDateRange,
+    getByPriceRange,
+  };
 }
-
-export default new FlightRepository();

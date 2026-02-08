@@ -8,7 +8,10 @@ class AppError extends Error {
     const messageStr = Array.isArray(message) ? message.join("; ") : message;
     super(messageStr);
     this.statusCode = statusCode;
-    this.explanation = message;
+    // Normalize explanation to an array for consistent handling
+    this.explanation = Array.isArray(message) ? message : [messageStr];
+    // Set the error name for easier detection
+    this.name = 'AppError';
 
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, AppError.prototype);

@@ -2,13 +2,15 @@ import winston from "winston";
 
 const { combine, timestamp, label, printf } = winston.format;
 
-const customFormat = printf(({ level, message, label, timestamp }) => {
-  return `${timestamp} [${label}] ${level}: ${message}`;
+const customFormat = printf((info) => {
+  const { level, message, label: lbl, timestamp, ...rest } = info as any;
+  const meta = Object.keys(rest).length ? ` ${JSON.stringify(rest, null, 2)}` : "";
+  return `${timestamp} [${lbl}] ${level}: ${message}${meta}`;
 });
 
 const logger = winston.createLogger({
   format: combine(
-    label({ label: "right meow!" }),
+    label({ label: "airline-backend" }),
     timestamp({format:"YYYY-MM-DD HH:mm:ss"}),
     customFormat
   ),

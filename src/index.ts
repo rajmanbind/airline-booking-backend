@@ -83,6 +83,13 @@ const startServer = async () => {
       await sequelize.close();
       Logger.info('Database connection closed');
       if (err) Logger.error('Shutdown due to error:', err);
+      // Allow platforms/tools (like nodemon) that send SIGUSR2 to restart the process.
+      // For SIGUSR2 we perform cleanup but do NOT call `process.exit` so the
+      // caller can re-signal the process (e.g. `process.kill(pid, 'SIGUSR2')`).
+      if (signal === 'SIGUSR2') {
+        Logger.info('Not exiting process for SIGUSR2 (hot restart)');
+        return;
+      }
       process.exit(0);
     } catch (shutdownErr) {
       Logger.error('Error during graceful shutdown', shutdownErr);
@@ -101,6 +108,24 @@ const startServer = async () => {
   process.on('uncaughtException', (error: any) => {
     Logger.error('Uncaught Exception:', error);
     gracefulShutdown('uncaughtException', error instanceof Error ? error : undefined);
+  });
+
+  // Handle common system signals for graceful shutdown
+  const signals: NodeJS.Signals[] = ['SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGHUP'];
+  signals.forEach((sig) => {
+    process.on(sig, () => {
+      Logger.info(`Received ${sig}`);
+      // fire-and-forget graceful shutdown
+      void gracefulShutdown(sig);
+    });
+  });
+
+  // Special-case for nodemon and some debuggers which use SIGUSR2 to restart
+  process.once('SIGUSR2', async () => {
+    Logger.info('Received SIGUSR2 (restart). Shutting down gracefully for restart...');
+    await gracefulShutdown('SIGUSR2');
+    // Re-signal the process to allow the restarter to continue (e.g., nodemon)
+    process.kill(process.pid, 'SIGUSR2');
   });
 };
 

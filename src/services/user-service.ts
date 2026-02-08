@@ -1,8 +1,7 @@
-import userRepo from "../repositories/user-repository";
+import { UserRepository } from "../repositories/user-repository";
 import models from "../models";
 import { Logger } from "../config";
 import { AppError } from "../utils/errors/app-error";
-import { handleDatabaseError } from "../utils/errors/database-error-handler";
 import { Op } from "sequelize";
 import { StatusCodes } from "http-status-codes";
 import {
@@ -14,6 +13,7 @@ import {
 } from "../types";
 
 const { User } = models;
+const userRepo = UserRepository();
 
 export const UserService = {
   async createUser(data: CreateUserDTO): Promise<UserResponse> {
@@ -23,7 +23,7 @@ export const UserService = {
       const { password, ...userWithoutPassword } = user.toJSON();
       return userWithoutPassword as UserResponse;
     } catch (error: any) {
-      handleDatabaseError(error, 'user creation');
+      throw error;
     }
   },
 
@@ -36,15 +36,23 @@ export const UserService = {
       const { password, ...userWithoutPassword } = user.toJSON();
       return userWithoutPassword as UserResponse;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'fetching user');
+      if (error.statusCode === StatusCodes.NOT_FOUND) {
+        throw new AppError("The user you requested is not present", StatusCodes.NOT_FOUND);
+      }
+      throw new AppError("Cannot fetch data of all users", StatusCodes.INTERNAL_SERVER_ERROR);
     }
   },
 
   async getAllUsers(params: UserQueryParams): Promise<PaginatedUsersResponse> {
     try {
       const { page = 1, limit = 20, sortBy = 'createdAt', order = 'desc', ...filters } = params;
-      const offset = (page - 1) * limit;
+      const parsedPage = Number.isFinite(Number(page)) ? Math.max(1, Number(page)) : 1;
+      const parsedLimit = Number.isFinite(Number(limit)) ? Math.max(1, Math.min(1000, Number(limit))) : 20;
+      const offset = (parsedPage - 1) * parsedLimit;
+
+      const allowedSorts = ['createdAt', 'lastName', 'firstName', 'email'];
+      const sortColumn = typeof sortBy === 'string' && allowedSorts.includes(sortBy) ? sortBy : 'createdAt';
+      const orderDir = typeof order === 'string' && order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
 
       const where: any = {};
       if (filters.email) where.email = filters.email.toLowerCase();
@@ -53,9 +61,9 @@ export const UserService = {
 
       const { count, rows } = await User.findAndCountAll({
         where,
-        limit,
+        limit: parsedLimit,
         offset,
-        order: [[sortBy, order.toUpperCase()]],
+        order: [[sortColumn, orderDir]],
         attributes: { exclude: ['password'] }
       });
 
@@ -63,13 +71,13 @@ export const UserService = {
         data: rows as any,
         pagination: {
           total: count,
-          page,
-          limit,
-          totalPages: Math.ceil(count / limit)
+          page: parsedPage,
+          limit: parsedLimit,
+          totalPages: Math.ceil(count / parsedLimit)
         }
       };
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching users');
+      throw error;
     }
   },
 
@@ -82,21 +90,19 @@ export const UserService = {
       const { password, ...userWithoutPassword } = user.toJSON();
       return userWithoutPassword as UserResponse;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'updating user');
+      throw error;
     }
   },
 
   async deleteUser(id: number): Promise<boolean> {
     try {
       const result = await userRepo.destroy(id);
-      if (result === 0) {
-        throw new AppError('User not found', StatusCodes.NOT_FOUND);
-      }
       return result > 0;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'deleting user');
+      if (error.statusCode === StatusCodes.NOT_FOUND) {
+        throw new AppError("The user you requested to delete is not present", StatusCodes.NOT_FOUND);
+      }
+      throw error;
     }
   },
 
@@ -109,8 +115,7 @@ export const UserService = {
       const { password, ...userWithoutPassword } = user.toJSON();
       return userWithoutPassword as UserResponse;
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      handleDatabaseError(error, 'fetching user by email');
+      throw error;
     }
   },
 
@@ -122,7 +127,7 @@ export const UserService = {
         return userWithoutPassword as UserResponse;
       });
     } catch (error: any) {
-      handleDatabaseError(error, 'fetching users by role');
+      throw error;
     }
   }
 };

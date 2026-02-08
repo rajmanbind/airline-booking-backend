@@ -43,6 +43,11 @@ const models_1 = require("./models");
 const middlewares_1 = require("./middlewares");
 // Create app
 const app = (0, express_1.default)();
+// Trust proxy - enables correct IP tracking behind load balancer/proxy
+// Critical for rate limiting to work correctly in production
+if (config_1.ServerConfig.NODE_ENV === 'production') {
+    app.set('trust proxy', 1); // Trust first proxy (NGINX, CloudFlare, AWS ALB)
+}
 // Security + Middleware
 (0, middlewares_1.applySecurity)(app);
 app.use(express_1.default.json());
@@ -110,6 +115,13 @@ const startServer = async () => {
             config_1.Logger.info('Database connection closed');
             if (err)
                 config_1.Logger.error('Shutdown due to error:', err);
+            // Allow platforms/tools (like nodemon) that send SIGUSR2 to restart the process.
+            // For SIGUSR2 we perform cleanup but do NOT call `process.exit` so the
+            // caller can re-signal the process (e.g. `process.kill(pid, 'SIGUSR2')`).
+            if (signal === 'SIGUSR2') {
+                config_1.Logger.info('Not exiting process for SIGUSR2 (hot restart)');
+                return;
+            }
             process.exit(0);
         }
         catch (shutdownErr) {
@@ -127,6 +139,22 @@ const startServer = async () => {
     process.on('uncaughtException', (error) => {
         config_1.Logger.error('Uncaught Exception:', error);
         gracefulShutdown('uncaughtException', error instanceof Error ? error : undefined);
+    });
+    // Handle common system signals for graceful shutdown
+    const signals = ['SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGHUP'];
+    signals.forEach((sig) => {
+        process.on(sig, () => {
+            config_1.Logger.info(`Received ${sig}`);
+            // fire-and-forget graceful shutdown
+            void gracefulShutdown(sig);
+        });
+    });
+    // Special-case for nodemon and some debuggers which use SIGUSR2 to restart
+    process.once('SIGUSR2', async () => {
+        config_1.Logger.info('Received SIGUSR2 (restart). Shutting down gracefully for restart...');
+        await gracefulShutdown('SIGUSR2');
+        // Re-signal the process to allow the restarter to continue (e.g., nodemon)
+        process.kill(process.pid, 'SIGUSR2');
     });
 };
 // Start the server

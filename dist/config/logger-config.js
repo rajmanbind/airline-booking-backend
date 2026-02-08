@@ -5,11 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const winston_1 = __importDefault(require("winston"));
 const { combine, timestamp, label, printf } = winston_1.default.format;
-const customFormat = printf(({ level, message, label, timestamp }) => {
-    return `${timestamp} [${label}] ${level}: ${message}`;
+const customFormat = printf((info) => {
+    const { level, message, label: lbl, timestamp, ...rest } = info;
+    const meta = Object.keys(rest).length ? ` ${JSON.stringify(rest, null, 2)}` : "";
+    return `${timestamp} [${lbl}] ${level}: ${message}${meta}`;
 });
 const logger = winston_1.default.createLogger({
-    format: combine(label({ label: "right meow!" }), timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), customFormat),
+    format: combine(label({ label: "airline-backend" }), timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), customFormat),
     transports: [
         // Console output
         new winston_1.default.transports.Console(),

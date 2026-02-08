@@ -106,13 +106,50 @@ function errorHandler(err: any, req: Request, res: Response, next: NextFunction)
 		errors = [err.message];
 	}
 	// Handle Sequelize/Database errors (should be caught by handleDatabaseError)
-	else if (err.name && err.name.startsWith('Sequelize')) {
-		statusCode = StatusCodes.BAD_REQUEST;
-		message = 'Database operation failed';
-		// Don't expose database details in production
-		errors = ServerConfig.NODE_ENV === 'production' 
-			? ['Invalid request data']
-			: [err.message];
+	else if (err && err.name && err.name.startsWith('Sequelize')) {
+		// Specific Sequelize error mappings (copied from database-error-handler)
+		if (err.name === 'SequelizeValidationError') {
+			statusCode = StatusCodes.BAD_REQUEST;
+			message = 'Validation failed';
+			errors = err.errors ? Object.values(err.errors).map((e: any) => e.message) : [err.message];
+		} else if (err.name === 'SequelizeUniqueConstraintError') {
+			statusCode = StatusCodes.CONFLICT;
+			message = 'A record with this information already exists';
+			errors = ServerConfig.NODE_ENV === 'production' ? ['Conflict'] : [err.message];
+			Logger.warn('Unique constraint violation:', { fields: err.fields, table: err.table });
+		} else if (err.name === 'SequelizeForeignKeyConstraintError') {
+			statusCode = StatusCodes.BAD_REQUEST;
+			const isDelete = err.parent?.code === 'ER_ROW_IS_REFERENCED_2';
+			message = isDelete ? 'Cannot delete: This record is being used by other data' : 'Invalid data: The referenced item does not exist';
+			errors = [message];
+			Logger.error('Foreign key constraint error:', { table: err.table, constraint: err.index });
+		} else if (err.name === 'SequelizeDatabaseError') {
+			statusCode = StatusCodes.BAD_REQUEST;
+			// Map some common DB error codes to friendlier messages
+			if (err.parent?.code === 'ER_DATA_TOO_LONG') {
+				message = 'One or more values exceed the maximum length';
+				errors = [message];
+			} else if (err.parent?.code === 'ER_BAD_NULL_ERROR') {
+				message = 'Required information is missing';
+				errors = [message];
+			} else if (err.parent?.code === 'ER_TRUNCATED_WRONG_VALUE') {
+				message = 'Invalid data format provided';
+				errors = [message];
+			} else {
+				message = ServerConfig.NODE_ENV === 'production' ? 'Invalid request data' : err.message;
+				errors = [message];
+			}
+			Logger.error('Database error:', { code: err.parent?.code, sql: err.sql });
+		} else if (err.name === 'SequelizeConnectionError' || err.name === 'SequelizeTimeoutError') {
+			statusCode = StatusCodes.SERVICE_UNAVAILABLE;
+			message = 'Service temporarily unavailable. Please try again in a moment';
+			errors = [message];
+			Logger.error('Database connection/timeout error:', { name: err.name, message: err.message });
+		} else {
+			statusCode = StatusCodes.BAD_REQUEST;
+			message = ServerConfig.NODE_ENV === 'production' ? 'Invalid request data' : err.message;
+			errors = [message];
+		}
 	}
 	// Handle rate limit errors
 	else if (err.status === 429) {
@@ -138,24 +175,38 @@ function errorHandler(err: any, req: Request, res: Response, next: NextFunction)
 		}
 	}
 
-	// Build error response
-	const errorResponse = {
-		success: false,
-		message,
-		error: {
-			statusCode,
-			explanation: errors,
-			// Include request ID for tracking/support
-			requestId,
-			// Include timestamp
-			timestamp: new Date().toISOString(),
-			// Only include stack trace in development
-			...(ServerConfig.NODE_ENV !== 'production' && err.stack ? { stack: err.stack } : {}),
-		}
+	// Build response using the shared ErrorResponse template but avoid mutating the module-level object.
+	const originalErrorDetails = ServerConfig.NODE_ENV !== 'production' ? {
+		name: err?.name,
+		message: err?.message,
+		explanation: err?.explanation ?? null,
+		code: err?.code || err?.parent?.code,
+		fields: err?.fields,
+		table: err?.table,
+		sql: err?.sql || err?.parent?.sql,
+	} : undefined;
+
+	const responseTemplate = { ...ErrorResponse } as any;
+	responseTemplate.message = message;
+
+	// In non-production include original error message in explanation and include stack
+	const explanationArr = Array.isArray(errors) ? [...errors] : [errors];
+	if (originalErrorDetails && originalErrorDetails.message) {
+		const origMsg = String(originalErrorDetails.message);
+		if (!explanationArr.includes(origMsg)) explanationArr.push(origMsg);
+	}
+
+	responseTemplate.error = {
+		statusCode,
+		explanation: explanationArr,
+		requestId,
+		timestamp: new Date().toISOString(),
+		...(ServerConfig.NODE_ENV !== 'production' && err.stack ? { stack: err.stack } : {}),
+		...(ServerConfig.NODE_ENV !== 'production' && originalErrorDetails ? { original: originalErrorDetails } : {}),
 	};
 
 	// Send response
-	res.status(statusCode).json(errorResponse);
+	res.status(statusCode).json(responseTemplate);
 }
 
 // Auth rate limiter - export for use in route files

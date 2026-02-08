@@ -4,73 +4,64 @@ import { CrudRepository } from './crud-repositories';
 
 type Ticket = typeof models.Ticket extends { prototype: infer T } ? T : never;
 
-class TicketRepository {
-  private crudRepo: ReturnType<typeof CrudRepository<Ticket, CreateTicketDTO>>;
+export function TicketRepository() {
+  const baseRepo = CrudRepository<Ticket, CreateTicketDTO>(models.Ticket);
 
-  constructor() {
-    this.crudRepo = CrudRepository<Ticket, CreateTicketDTO>(models.Ticket);
-  }
+  const getByBookingId = async (bookingId: number): Promise<Ticket[]> => {
+    try {
+      return await models.Ticket.findAll({ where: { bookingId }, order: [['createdAt', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async create(data: CreateTicketDTO): Promise<Ticket> {
-    return await this.crudRepo.create(data);
-  }
+  const getByFlightId = async (flightId: number): Promise<Ticket[]> => {
+    try {
+      return await models.Ticket.findAll({ where: { flightId }, order: [['createdAt', 'ASC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async getAll(filter: any = {}): Promise<Ticket[]> {
-    return await this.crudRepo.findAll(filter);
-  }
+  const getByPassengerId = async (passengerId: number): Promise<Ticket[]> => {
+    try {
+      return await models.Ticket.findAll({ where: { passengerId }, order: [['createdAt', 'DESC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async getById(id: number): Promise<Ticket | null> {
-    return await this.crudRepo.getById(id);
-  }
+  const getByTicketNumber = async (ticketNumber: string): Promise<Ticket | null> => {
+    try {
+      return await models.Ticket.findOne({ where: { ticketNumber } });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async update(id: number, data: Partial<CreateTicketDTO>): Promise<Ticket | null> {
-    return await this.crudRepo.update(id, data);
-  }
+  const getByStatus = async (status: string): Promise<Ticket[]> => {
+    try {
+      return await models.Ticket.findAll({ where: { status }, order: [['createdAt', 'DESC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async destroy(id: number): Promise<number> {
-    return await this.crudRepo.destroy(id);
-  }
+  const getByClass = async (ticketClass: string): Promise<Ticket[]> => {
+    try {
+      return await models.Ticket.findAll({ where: { class: ticketClass }, order: [['createdAt', 'DESC']] });
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  async getByBookingId(bookingId: number): Promise<Ticket[]> {
-    return await models.Ticket.findAll({
-      where: { bookingId },
-      order: [['createdAt', 'ASC']]
-    });
-  }
-
-  async getByFlightId(flightId: number): Promise<Ticket[]> {
-    return await models.Ticket.findAll({
-      where: { flightId },
-      order: [['createdAt', 'ASC']]
-    });
-  }
-
-  async getByPassengerId(passengerId: number): Promise<Ticket[]> {
-    return await models.Ticket.findAll({
-      where: { passengerId },
-      order: [['createdAt', 'DESC']]
-    });
-  }
-
-  async getByTicketNumber(ticketNumber: string): Promise<Ticket | null> {
-    return await models.Ticket.findOne({
-      where: { ticketNumber }
-    });
-  }
-
-  async getByStatus(status: string): Promise<Ticket[]> {
-    return await models.Ticket.findAll({
-      where: { status },
-      order: [['createdAt', 'DESC']]
-    });
-  }
-
-  async getByClass(ticketClass: string): Promise<Ticket[]> {
-    return await models.Ticket.findAll({
-      where: { class: ticketClass },
-      order: [['createdAt', 'DESC']]
-    });
-  }
+  return {
+    ...baseRepo,
+    getByBookingId,
+    getByFlightId,
+    getByPassengerId,
+    getByTicketNumber,
+    getByStatus,
+    getByClass,
+  };
 }
-
-export default new TicketRepository();

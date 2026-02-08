@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AirplaneService = void 0;
 const airplane_repository_1 = require("../repositories/airplane-repository");
-const config_1 = require("../config");
 const app_error_1 = require("../utils/errors/app-error");
 const sequelize_1 = require("sequelize");
 const http_status_codes_1 = require("http-status-codes");
@@ -13,25 +12,19 @@ exports.AirplaneService = {
             return await airplaneRepo.create(data);
         }
         catch (error) {
-            if (error && error.name === "SequelizeValidationError") {
-                const explanations = [];
-                error.errors.forEach((err) => {
-                    explanations.push(err.message);
-                });
-                config_1.Logger.debug("Validation explanations:", explanations);
-                throw new app_error_1.AppError(explanations, http_status_codes_1.StatusCodes.BAD_REQUEST);
-            }
-            // For unexpected errors, wrap with 500 and the error message
-            const message = error instanceof Error ? error.message : 'Internal Server Error';
-            throw new app_error_1.AppError([message], http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR);
+            throw error;
         }
     },
     async getAirplaneById(id) {
         try {
-            return await airplaneRepo.getById(id);
+            const response = await airplaneRepo.getById(id);
+            return response;
         }
         catch (error) {
-            config_1.Logger.error("Something went wrong in AirplaneService: getAirplaneById", error);
+            if (error.statusCode === http_status_codes_1.StatusCodes.NOT_FOUND) {
+                throw new app_error_1.AppError("The airplane you requested is not present", http_status_codes_1.StatusCodes.NOT_FOUND);
+            }
+            // Rethrow unexpected errors so global error handler can map/log them
             throw error;
         }
     },
@@ -48,43 +41,64 @@ exports.AirplaneService = {
             if (filters.modelNumber)
                 where.modelNumber = String(filters.modelNumber);
             // determine sorting
-            let order = [['id', 'ASC']];
+            let order = [["id", "ASC"]];
             const sortField = filters.sort || filters.sortBy;
-            const sortDir = (String(filters.order || filters.direction || '').toLowerCase() === 'desc') ? 'DESC' : 'ASC';
+            const sortDir = String(filters.order || filters.direction || "").toLowerCase() ===
+                "desc"
+                ? "DESC"
+                : "ASC";
             if (sortField) {
                 order = [[String(sortField), sortDir]];
             }
-            const { rows, count } = await airplaneRepo.getAllAirplanes({ where, limit, offset, order });
+            const { rows, count } = await airplaneRepo.getAll({
+                where,
+                limit,
+                offset,
+                order,
+            });
             return {
                 data: rows,
-                meta: {
-                    total: Number(count),
-                    page,
-                    limit,
+                pagination: {
+                    totalItems: Number(count),
+                    currentPage: page,
                     totalPages: Math.ceil(Number(count) / limit) || 0,
+                    itemsPerPage: limit,
+                    hasNextPage: page < Math.ceil(Number(count) / limit),
+                    hasPreviousPage: page > 1,
                 },
             };
         }
         catch (error) {
-            config_1.Logger.error("Something went wrong in AirplaneService: getAllAirplanes", error);
             throw error;
         }
     },
     async updateAirplane(id, data) {
         try {
-            return await airplaneRepo.update(id, data);
+            // Only pass allowed fields to repository
+            const sanitizedData = {};
+            if ('modelNumber' in data)
+                sanitizedData.modelNumber = data.modelNumber;
+            if ('capacity' in data)
+                sanitizedData.capacity = data.capacity;
+            return await airplaneRepo.update(id, sanitizedData);
         }
         catch (error) {
-            config_1.Logger.error("Something went wrong in AirplaneService: updateAirplane");
+            // Handle NOT_FOUND with custom message before delegating to generic handler
+            if (error.statusCode === http_status_codes_1.StatusCodes.NOT_FOUND) {
+                throw new app_error_1.AppError("The airplane you requested to update is not present", http_status_codes_1.StatusCodes.NOT_FOUND);
+            }
             throw error;
         }
     },
     async deleteAirplane(id) {
         try {
-            return await airplaneRepo.deleteById(id);
+            const result = await airplaneRepo.deleteById(id);
+            return result;
         }
         catch (error) {
-            config_1.Logger.error("Something went wrong in AirplaneService: deleteAirplane");
+            if (error.statusCode === http_status_codes_1.StatusCodes.NOT_FOUND) {
+                throw new app_error_1.AppError("The airplane you requested to delete is not present", http_status_codes_1.StatusCodes.NOT_FOUND);
+            }
             throw error;
         }
     },
